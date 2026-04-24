@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v0.3</title>
+<title>The 4th Edge · ESG 플랫폼 v0.4</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -369,7 +369,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v0.3 · 사이드바 메뉴</div>
+        <div className="muted">v0.4 · 상태 유지</div>
       </div>
     </div>
   );
@@ -566,8 +566,18 @@ function CategoryPane({ category }) {
 
 function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout }) {
   const [categories, setCategories] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelectedRaw] = useState(null);
   const [loadErr, setLoadErr] = useState("");
+
+  const lsKey = `t4e_category_id__${company.id}`;
+
+  function setSelected(c) {
+    setSelectedRaw(c);
+    try {
+      if (c) localStorage.setItem(lsKey, c.id);
+      else localStorage.removeItem(lsKey);
+    } catch (e) {}
+  }
 
   useEffect(() => {
     let alive = true;
@@ -578,10 +588,19 @@ function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout 
         setLoadErr("카테고리 조회 실패: " + error.message);
         return;
       }
-      setCategories(data || []);
+      const list = data || [];
+      setCategories(list);
+      // 이전 선택 복원
+      try {
+        const savedId = localStorage.getItem(lsKey);
+        if (savedId) {
+          const found = list.find(c => c.id === savedId);
+          if (found) setSelectedRaw(found);
+        }
+      } catch (e) {}
     })();
     return () => { alive = false; };
-  }, [supabase]);
+  }, [supabase, company.id]);
 
   return (
     <div className="app-layout">
@@ -633,14 +652,25 @@ function LoadingView() {
 }
 
 // ==================== 앱 본체 ====================
+const LS_COMPANY = "t4e_company_id";
+
 function App() {
   const supabase = useSupabase();
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [companies, setCompanies] = useState([]);
-  const [picked, setPicked] = useState(null);
+  const [picked, setPickedRaw] = useState(null);
   const [loading, setLoading] = useState(true);
   const [profileErr, setProfileErr] = useState("");
+
+  // 회사 선택 시 localStorage 저장
+  function setPicked(c) {
+    setPickedRaw(c);
+    try {
+      if (c) localStorage.setItem(LS_COMPANY, c.id);
+      else localStorage.removeItem(LS_COMPANY);
+    } catch (e) {}
+  }
 
   useEffect(() => {
     if (!supabase) return;
@@ -651,7 +681,10 @@ function App() {
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
-      if (!s) { setProfile(null); setCompanies([]); setPicked(null); setProfileErr(""); }
+      if (!s) {
+        setProfile(null); setCompanies([]); setPickedRaw(null); setProfileErr("");
+        try { localStorage.removeItem(LS_COMPANY); } catch (e) {}
+      }
     });
     return () => { mounted = false; sub.subscription.unsubscribe(); };
   }, [supabase]);
@@ -676,13 +709,25 @@ function App() {
       const { data: cs, error: ce } = await q;
       if (!alive) return;
       if (ce) { setProfileErr("companies 조회 실패: " + ce.message); return; }
-      setCompanies(cs || []);
-      if ((cs || []).length === 1) setPicked(cs[0]);
+      const list = cs || [];
+      setCompanies(list);
+
+      // 새로고침 시 이전 선택 복원
+      let restored = null;
+      try {
+        const savedId = localStorage.getItem(LS_COMPANY);
+        if (savedId) restored = list.find(c => c.id === savedId) || null;
+      } catch (e) {}
+      if (restored) setPickedRaw(restored);
+      else if (list.length === 1) { setPickedRaw(list[0]); try { localStorage.setItem(LS_COMPANY, list[0].id); } catch(e){} }
     })();
     return () => { alive = false; };
   }, [supabase, session]);
 
-  async function handleLogout() { if (supabase) await supabase.auth.signOut(); }
+  async function handleLogout() {
+    try { localStorage.removeItem(LS_COMPANY); } catch (e) {}
+    if (supabase) await supabase.auth.signOut();
+  }
 
   if (!supabase || loading) return <LoadingView />;
   if (!session) return <LoginView supabase={supabase} />;
