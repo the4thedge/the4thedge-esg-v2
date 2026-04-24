@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v0.2</title>
+<title>The 4th Edge · ESG 플랫폼 v0.3</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -15,16 +15,18 @@
     background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
     min-height: 100vh;
     color: #fff;
+    overflow: hidden;
   }
-  #root { min-height: 100vh; }
+  #root { min-height: 100vh; height: 100vh; }
 
-  /* ===== 공통 카드 ===== */
+  /* ===== 로그인·회사선택 공통 카드 ===== */
   .center {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    overflow: auto;
   }
   .card {
     background: rgba(255, 255, 255, 0.08);
@@ -38,201 +40,241 @@
   }
   .card-wide { max-width: 720px; }
   .logo {
-    font-size: 13px;
-    letter-spacing: 6px;
-    color: #88ccff;
-    margin-bottom: 14px;
-    font-weight: 600;
-    text-align: center;
+    font-size: 13px; letter-spacing: 6px; color: #88ccff;
+    margin-bottom: 14px; font-weight: 600; text-align: center;
   }
   h1 {
-    font-size: 28px;
-    line-height: 1.25;
-    margin-bottom: 8px;
-    font-weight: 700;
-    text-align: center;
+    font-size: 28px; line-height: 1.25; margin-bottom: 8px;
+    font-weight: 700; text-align: center;
   }
-  h2 {
-    font-size: 22px;
-    line-height: 1.3;
-    margin-bottom: 8px;
-    font-weight: 700;
-  }
+  h2 { font-size: 22px; line-height: 1.3; margin-bottom: 8px; font-weight: 700; }
   .subtitle {
-    font-size: 14px;
-    color: #a0b8c8;
-    margin-bottom: 32px;
-    text-align: center;
-    line-height: 1.5;
+    font-size: 14px; color: #a0b8c8; margin-bottom: 32px;
+    text-align: center; line-height: 1.5;
   }
-
-  /* ===== 입력 ===== */
   label {
-    display: block;
-    font-size: 13px;
-    color: #a0b8c8;
-    margin-bottom: 6px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    display: block; font-size: 13px; color: #a0b8c8;
+    margin-bottom: 6px; font-weight: 600; letter-spacing: 0.5px;
   }
   input[type=email], input[type=password], input[type=text] {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-    padding: 13px 16px;
-    color: #fff;
-    font-size: 15px;
-    transition: border 0.15s;
-    font-family: inherit;
+    width: 100%; background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px;
+    padding: 13px 16px; color: #fff; font-size: 15px;
+    transition: border 0.15s; font-family: inherit;
   }
-  input:focus {
-    outline: none;
-    border-color: #88ccff;
-  }
+  input:focus { outline: none; border-color: #88ccff; }
   .field { margin-bottom: 16px; }
 
-  /* ===== 버튼 ===== */
   button {
     background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
-    color: #fff;
-    border: none;
-    padding: 13px 20px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    transition: transform 0.12s, box-shadow 0.12s;
-    font-family: inherit;
+    color: #fff; border: none; padding: 13px 20px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
+    transition: transform 0.12s, box-shadow 0.12s; font-family: inherit;
   }
   button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(59,130,246,0.4); }
   button:active { transform: translateY(0); }
   button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   button.ghost {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #a0b8c8;
-    box-shadow: none;
+    background: transparent; border: 1px solid rgba(255,255,255,0.2);
+    color: #a0b8c8; box-shadow: none;
   }
   button.ghost:hover { background: rgba(255,255,255,0.05); box-shadow: none; }
 
   .err {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
-    padding: 12px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    margin-bottom: 16px;
-    line-height: 1.5;
+    background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5; padding: 12px 14px; border-radius: 8px; font-size: 13px;
+    margin-bottom: 16px; line-height: 1.5;
   }
-  .muted { color: #6b8290; font-size: 12px; text-align: center; margin-top: 20px; letter-spacing: 1px; }
+  .muted {
+    color: #6b8290; font-size: 12px; text-align: center;
+    margin-top: 20px; letter-spacing: 1px;
+  }
 
   /* ===== 회사 선택 ===== */
   .company-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
-    margin-top: 24px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px; margin-top: 24px;
   }
   .company-card {
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 12px;
-    padding: 20px 18px;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
+    background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px; padding: 20px 18px; cursor: pointer;
+    transition: all 0.15s; text-align: left;
   }
   .company-card:hover {
-    background: rgba(136, 204, 255, 0.08);
-    border-color: #88ccff;
+    background: rgba(136, 204, 255, 0.08); border-color: #88ccff;
     transform: translateY(-2px);
   }
-  .company-card .cname {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .company-card .ccode {
-    font-size: 11px;
-    color: #6b8290;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+  .company-card .cname { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .company-card .ccode { font-size: 11px; color: #6b8290; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ===== 레이아웃: 사이드바 + 메인 ===== */
+  .app-layout {
+    display: flex; height: 100vh; overflow: hidden;
   }
 
-  /* ===== 대시보드 ===== */
-  .topbar {
-    background: rgba(0, 0, 0, 0.25);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 14px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  /* ===== 사이드바 ===== */
+  .sidebar {
+    width: 280px; flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.35);
+    border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column;
+    overflow: hidden;
   }
-  .topbar-left { display: flex; align-items: center; gap: 16px; }
-  .topbar .brand { font-size: 13px; letter-spacing: 4px; color: #88ccff; font-weight: 600; }
-  .topbar .sep { color: #3a546a; }
-  .topbar .company-pill {
-    background: rgba(136, 204, 255, 0.12);
-    border: 1px solid rgba(136, 204, 255, 0.3);
-    color: #88ccff;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 13px;
+  .sb-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .sb-brand { font-size: 12px; letter-spacing: 4px; color: #88ccff; font-weight: 700; }
+  .sb-company {
+    margin-top: 10px;
+    background: rgba(136, 204, 255, 0.1);
+    border: 1px solid rgba(136, 204, 255, 0.25);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .sb-company-name { font-size: 14px; font-weight: 700; color: #c9e4f7; }
+  .sb-company-change {
+    font-size: 11px; color: #88ccff; background: none; border: none;
+    padding: 4px 8px; cursor: pointer; width: auto; letter-spacing: 0;
     font-weight: 600;
   }
-  .topbar-right { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #a0b8c8; }
-  .topbar-right button { width: auto; padding: 7px 14px; font-size: 13px; }
-  .role-badge {
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+  .sb-company-change:hover { background: rgba(136,204,255,0.15); box-shadow: none; }
+
+  .sb-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
+  .sb-nav::-webkit-scrollbar { width: 6px; }
+  .sb-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+  .sb-group { margin-bottom: 4px; }
+  .sb-group-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px; cursor: pointer;
+    color: #a0b8c8; font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    transition: color 0.12s; user-select: none;
   }
-  .role-staff { background: rgba(148,163,184,0.2); color: #cbd5e1; }
-  .role-manager { background: rgba(34,197,94,0.2); color: #86efac; }
+  .sb-group-head:hover { color: #fff; }
+  .sb-group-icon { font-size: 15px; }
+  .sb-group-count { margin-left: auto; font-size: 10px; color: #6b8290; }
+  .sb-group-chevron {
+    width: 10px; height: 10px; border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor; transform: rotate(45deg);
+    transition: transform 0.18s;
+  }
+  .sb-group-chevron.open { transform: rotate(-135deg); }
+
+  .sb-items { display: none; }
+  .sb-items.open { display: block; }
+  .sb-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 20px 9px 44px; cursor: pointer;
+    color: #c9d6e0; font-size: 13.5px;
+    transition: all 0.12s; border-left: 3px solid transparent;
+    user-select: none;
+  }
+  .sb-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
+  .sb-item.active {
+    background: rgba(136, 204, 255, 0.1);
+    color: #88ccff; font-weight: 600;
+    border-left-color: #88ccff;
+  }
+  .sb-item-count {
+    font-size: 10px; color: #6b8290; background: rgba(0,0,0,0.3);
+    padding: 2px 6px; border-radius: 8px; min-width: 24px; text-align: center;
+  }
+  .sb-item.active .sb-item-count { color: #88ccff; background: rgba(136,204,255,0.1); }
+
+  .sb-footer {
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 14px 20px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .sb-user { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .sb-user-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+  }
+  .sb-user-info { flex: 1; overflow: hidden; }
+  .sb-user-name {
+    font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sb-user-role {
+    font-size: 10px; letter-spacing: 0.5px;
+    padding: 1px 6px; border-radius: 4px; margin-top: 2px;
+    display: inline-block; font-weight: 700;
+  }
+  .role-staff      { background: rgba(148,163,184,0.2); color: #cbd5e1; }
+  .role-manager    { background: rgba(34,197,94,0.2); color: #86efac; }
   .role-consultant { background: rgba(251,191,36,0.2); color: #fcd34d; }
 
-  .dashboard-body {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 24px;
+  .sb-logout {
+    background: transparent; border: 1px solid rgba(255,255,255,0.15);
+    color: #a0b8c8; padding: 8px; font-size: 12.5px; width: 100%;
   }
-  .placeholder-box {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px dashed rgba(255, 255, 255, 0.15);
-    border-radius: 16px;
-    padding: 60px 40px;
-    text-align: center;
-    margin-top: 24px;
+  .sb-logout:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; box-shadow: none; }
+
+  /* ===== 메인 영역 ===== */
+  .main {
+    flex: 1; overflow-y: auto; padding: 32px 40px;
   }
-  .placeholder-box h2 { margin-bottom: 12px; }
-  .placeholder-box p { color: #a0b8c8; line-height: 1.6; font-size: 14px; }
+  .main-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 28px; padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .main-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .main-subtitle { font-size: 13px; color: #a0b8c8; }
+  .main-meta {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .meta-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; color: #a0b8c8; font-weight: 600;
+    letter-spacing: 0.5px;
+  }
 
   .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px;
-    margin-top: 28px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px; margin-bottom: 28px;
   }
   .stat {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 20px;
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 20px;
   }
   .stat .n { font-size: 28px; font-weight: 700; color: #88ccff; }
   .stat .l { font-size: 12px; color: #6b8290; margin-top: 4px; letter-spacing: 1px; }
 
+  .placeholder-box {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 16px; padding: 60px 40px;
+    text-align: center; margin-top: 16px;
+  }
+  .placeholder-box h2 { margin-bottom: 12px; }
+  .placeholder-box p { color: #a0b8c8; line-height: 1.6; font-size: 14px; }
+
+  .welcome-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px; margin-top: 20px;
+  }
+  .welcome-card {
+    background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 22px 22px;
+  }
+  .welcome-card h3 {
+    font-size: 15px; font-weight: 700; margin-bottom: 10px; color: #88ccff;
+  }
+  .welcome-card p {
+    font-size: 13px; color: #a0b8c8; line-height: 1.6;
+  }
+
   .loading-dot {
-    display: inline-block;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #88ccff;
-    animation: pulse 1.4s infinite ease-in-out;
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: #88ccff; animation: pulse 1.4s infinite ease-in-out;
     margin-right: 4px;
   }
   @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -242,14 +284,48 @@
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect } = React;
+const { useState, useEffect, useMemo } = React;
 
 const SUPABASE_URL = "https://ucqqckuzuaeceuabndjw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_YsX59YkLF5vtK83k2DPxBg_6eM0Kev0";
 
 const ROLE_LABEL = { staff: "담당자", manager: "매니저", consultant: "컨설턴트" };
 
-// ====== Supabase 동적 로드 ======
+// 그룹 메타 (순서·아이콘·라벨)
+const GROUPS = [
+  { key: "environment", label: "환경",        icon: "🌱", order: 1 },
+  { key: "social",      label: "사회",        icon: "👥", order: 2 },
+  { key: "governance",  label: "거버넌스",    icon: "⚖️", order: 3 },
+  { key: "consultant",  label: "컨설턴트 전용", icon: "🎯", order: 4, consultantOnly: true },
+];
+
+// menu_categories 가 어떤 컬럼으로 그룹 구분을 하든 자동 판별
+function detectGroup(cat) {
+  // 1) 명시 컬럼
+  const direct = cat.group || cat.category_group || cat.section || cat.parent_group || cat.area;
+  if (direct) {
+    const d = String(direct).toLowerCase();
+    if (d.includes("env") || d.includes("환경")) return "environment";
+    if (d.includes("soc") || d.includes("사회")) return "social";
+    if (d.includes("gov") || d.includes("거버")) return "governance";
+    if (d.includes("cons") || d.includes("consultant") || d.includes("컨설")) return "consultant";
+  }
+  // 2) code prefix
+  const code = (cat.code || "").toLowerCase();
+  if (/^env|^e[_-]/.test(code)) return "environment";
+  if (/^soc|^s[_-]/.test(code)) return "social";
+  if (/^gov|^g[_-]/.test(code)) return "governance";
+  if (/^cons|^c[_-]/.test(code)) return "consultant";
+  // 3) name 안전망
+  const n = cat.name || cat.title || "";
+  if (/기후|에너지|용수|폐수|폐기물|대기|원재료|생물다양|환경/.test(n)) return "environment";
+  if (/임직원|채용|교육|안전|복리|노사|지역|고객/.test(n)) return "social";
+  if (/이사회|주주|정책|윤리|반부패|경제|회사 ?기본/.test(n)) return "governance";
+  if (/이중중요|content|검증|컨텐츠 ?인덱스/i.test(n)) return "consultant";
+  return "environment";
+}
+
+// ==================== Supabase ====================
 function useSupabase() {
   const [sb, setSb] = useState(null);
   useEffect(() => {
@@ -260,8 +336,8 @@ function useSupabase() {
   return sb;
 }
 
-// ====== 로그인 뷰 ======
-function LoginView({ supabase, onSuccess }) {
+// ==================== 로그인 ====================
+function LoginView({ supabase }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
@@ -269,13 +345,10 @@ function LoginView({ supabase, onSuccess }) {
 
   async function submit(e) {
     e.preventDefault();
-    setErr("");
-    setBusy(true);
+    setErr(""); setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) {
-      setErr("로그인 실패 · " + error.message);
-    }
+    if (error) setErr("로그인 실패 · " + error.message);
   }
 
   return (
@@ -296,13 +369,13 @@ function LoginView({ supabase, onSuccess }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v0.2 · 로그인 시스템</div>
+        <div className="muted">v0.3 · 사이드바 메뉴</div>
       </div>
     </div>
   );
 }
 
-// ====== 회사 선택 뷰 ======
+// ==================== 회사 선택 ====================
 function CompanyPickerView({ profile, companies, onPick, onLogout }) {
   return (
     <div className="center">
@@ -311,13 +384,10 @@ function CompanyPickerView({ profile, companies, onPick, onLogout }) {
         <h1>회사 선택</h1>
         <p className="subtitle">
           {profile.full_name || profile.email} · {ROLE_LABEL[profile.role] || profile.role}
-          <br />
-          작업할 회사를 선택하세요
+          <br />작업할 회사를 선택하세요
         </p>
         {companies.length === 0 ? (
-          <div className="err">
-            접근 가능한 회사가 없습니다. 관리자에게 companies 배열 할당을 요청하세요.
-          </div>
+          <div className="err">접근 가능한 회사가 없습니다. 관리자에게 companies 배열 할당을 요청하세요.</div>
         ) : (
           <div className="company-grid">
             {companies.map(c => (
@@ -336,52 +406,205 @@ function CompanyPickerView({ profile, companies, onPick, onLogout }) {
   );
 }
 
-// ====== 대시보드 껍데기 ======
-function DashboardShell({ profile, company, onChangeCompany, onLogout }) {
+// ==================== 사이드바 ====================
+function Sidebar({ profile, company, categories, selectedId, onSelect, onChangeCompany, onLogout }) {
+  // 그룹별 분류
+  const grouped = useMemo(() => {
+    const g = {};
+    for (const k of GROUPS.map(x => x.key)) g[k] = [];
+    for (const c of categories) {
+      const grp = detectGroup(c);
+      (g[grp] || g.environment).push(c);
+    }
+    // 각 그룹 내부 정렬 (display_order → name)
+    for (const k of Object.keys(g)) {
+      g[k].sort((a, b) => {
+        const oa = a.display_order ?? a.order ?? 999;
+        const ob = b.display_order ?? b.order ?? 999;
+        if (oa !== ob) return oa - ob;
+        return (a.name || "").localeCompare(b.name || "", "ko");
+      });
+    }
+    return g;
+  }, [categories]);
+
+  // 그룹 접기/펴기 상태 (기본: 다 펼침)
+  const [openGroups, setOpenGroups] = useState(() => {
+    const s = {};
+    GROUPS.forEach(g => s[g.key] = true);
+    return s;
+  });
+  const toggleGroup = k => setOpenGroups(s => ({ ...s, [k]: !s[k] }));
+
+  const visibleGroups = GROUPS.filter(g =>
+    !g.consultantOnly || profile.role === "consultant"
+  );
+
+  const initial = (profile.full_name || profile.email || "?").trim().charAt(0).toUpperCase();
+  const canChangeCompany = profile.role === "consultant" || (profile.companies && profile.companies.length > 1);
+
   return (
-    <div>
-      <div className="topbar">
-        <div className="topbar-left">
-          <span className="brand">THE 4TH EDGE</span>
-          <span className="sep">·</span>
-          <span className="company-pill">{company.name}</span>
-          {profile.role === "consultant" || (profile.companies && profile.companies.length > 1) ? (
-            <button className="ghost" onClick={onChangeCompany} style={{ width: "auto", padding: "4px 10px", fontSize: 12 }}>회사 변경</button>
-          ) : null}
-        </div>
-        <div className="topbar-right">
-          <span>{profile.full_name || profile.email}</span>
-          <span className={`role-badge role-${profile.role}`}>{ROLE_LABEL[profile.role] || profile.role}</span>
-          <button className="ghost" onClick={onLogout}>로그아웃</button>
+    <aside className="sidebar">
+      <div className="sb-header">
+        <div className="sb-brand">THE 4TH EDGE</div>
+        <div className="sb-company">
+          <div className="sb-company-name">{company.name}</div>
+          {canChangeCompany && (
+            <button className="sb-company-change" onClick={onChangeCompany}>변경</button>
+          )}
         </div>
       </div>
 
-      <div className="dashboard-body">
-        <h2>{company.name} · ESG 데이터 대시보드</h2>
-        <p style={{ color: "#a0b8c8", marginTop: 6, fontSize: 14 }}>
-          24개 메뉴 · 578개 입력 필드 · GRI 2025 신규표준 준거
+      <nav className="sb-nav">
+        {visibleGroups.map(g => {
+          const items = grouped[g.key] || [];
+          if (items.length === 0) return null;
+          const open = openGroups[g.key];
+          return (
+            <div className="sb-group" key={g.key}>
+              <div className="sb-group-head" onClick={() => toggleGroup(g.key)}>
+                <span className="sb-group-icon">{g.icon}</span>
+                <span>{g.label}</span>
+                <span className="sb-group-count">{items.length}</span>
+                <span className={`sb-group-chevron ${open ? "open" : ""}`}></span>
+              </div>
+              <div className={`sb-items ${open ? "open" : ""}`}>
+                {items.map(c => (
+                  <div
+                    key={c.id}
+                    className={`sb-item ${selectedId === c.id ? "active" : ""}`}
+                    onClick={() => onSelect(c)}
+                  >
+                    <span>{c.name}</span>
+                    {typeof c.field_count === "number" && (
+                      <span className="sb-item-count">{c.field_count}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </nav>
+
+      <div className="sb-footer">
+        <div className="sb-user">
+          <div className="sb-user-avatar">{initial}</div>
+          <div className="sb-user-info">
+            <div className="sb-user-name">{profile.full_name || profile.email}</div>
+            <span className={`sb-user-role role-${profile.role}`}>{ROLE_LABEL[profile.role] || profile.role}</span>
+          </div>
+        </div>
+        <button className="sb-logout" onClick={onLogout}>로그아웃</button>
+      </div>
+    </aside>
+  );
+}
+
+// ==================== 메인 영역 ====================
+function WelcomePane({ company, categoriesCount }) {
+  return (
+    <>
+      <div className="main-header">
+        <div>
+          <div className="main-title">{company.name} · ESG 데이터 대시보드</div>
+          <div className="main-subtitle">좌측 사이드바에서 카테고리를 선택하세요</div>
+        </div>
+      </div>
+
+      <div className="stats-grid">
+        <div className="stat"><div className="n">{categoriesCount}</div><div className="l">카테고리</div></div>
+        <div className="stat"><div className="n">578</div><div className="l">입력 필드</div></div>
+        <div className="stat"><div className="n">140</div><div className="l">GRI 공시</div></div>
+        <div className="stat"><div className="n">0</div><div className="l">입력 진행률</div></div>
+      </div>
+
+      <div className="welcome-grid">
+        <div className="welcome-card">
+          <h3>🌱 환경 · 사회 · 거버넌스 데이터 입력</h3>
+          <p>사업장·연도별로 578개 ESG 지표를 체계적으로 관리합니다. GRI 2025 신규표준 101·102·103 완전 준거.</p>
+        </div>
+        <div className="welcome-card">
+          <h3>🎯 이중중요성평가 v2</h3>
+          <p>ESRS IG1 기반 Scale × Scope × Irrem × Likelihood 평가. 외부 벤치마크 검증 루프까지 내장.</p>
+        </div>
+        <div className="welcome-card">
+          <h3>📊 자동 출력물 생성</h3>
+          <p>GRI Content Index Excel · 검증 대응 ZIP · 전문가 핸드오프 패키지를 한 번의 클릭으로.</p>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function CategoryPane({ category }) {
+  return (
+    <>
+      <div className="main-header">
+        <div>
+          <div className="main-title">{category.name}</div>
+          <div className="main-subtitle">{category.description || "ESG 데이터 입력"}</div>
+        </div>
+        <div className="main-meta">
+          {typeof category.field_count === "number" && (
+            <span className="meta-pill">입력 필드 {category.field_count}</span>
+          )}
+          {category.code && <span className="meta-pill">{category.code}</span>}
+        </div>
+      </div>
+
+      <div className="placeholder-box">
+        <h2>🚧 v0.4 입력폼 구현 예정</h2>
+        <p>
+          이 카테고리의 입력 필드가 <strong>{category.field_count || "—"}개</strong> 준비되어 있습니다.<br />
+          다음 버전에서 실제 데이터 입력 UI로 전환됩니다.
         </p>
-
-        <div className="stats-grid">
-          <div className="stat"><div className="n">24</div><div className="l">MENU</div></div>
-          <div className="stat"><div className="n">578</div><div className="l">FIELDS</div></div>
-          <div className="stat"><div className="n">140</div><div className="l">GRI DISCLOSURES</div></div>
-          <div className="stat"><div className="n">0</div><div className="l">INPUT PROGRESS</div></div>
-        </div>
-
-        <div className="placeholder-box">
-          <h2>🚧 v0.3 사이드바 · v0.4 입력폼 구현 예정</h2>
-          <p>
-            로그인 + 회사 선택 시스템이 정상 작동합니다.<br />
-            다음 단계: 24개 카테고리 사이드바 렌더링 → 첫 카테고리 입력폼 구현
-          </p>
-        </div>
       </div>
+    </>
+  );
+}
+
+function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout }) {
+  const [categories, setCategories] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [loadErr, setLoadErr] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data, error } = await supabase.from("menu_categories").select("*");
+      if (!alive) return;
+      if (error) {
+        setLoadErr("카테고리 조회 실패: " + error.message);
+        return;
+      }
+      setCategories(data || []);
+    })();
+    return () => { alive = false; };
+  }, [supabase]);
+
+  return (
+    <div className="app-layout">
+      <Sidebar
+        profile={profile}
+        company={company}
+        categories={categories}
+        selectedId={selected?.id}
+        onSelect={setSelected}
+        onChangeCompany={onChangeCompany}
+        onLogout={onLogout}
+      />
+      <main className="main">
+        {loadErr && <div className="err">{loadErr}</div>}
+        {selected
+          ? <CategoryPane category={selected} />
+          : <WelcomePane company={company} categoriesCount={categories.length} />}
+      </main>
     </div>
   );
 }
 
-// ====== 에러 뷰 ======
+// ==================== 에러 / 로딩 ====================
 function ErrorView({ message, onLogout }) {
   return (
     <div className="center">
@@ -389,16 +612,11 @@ function ErrorView({ message, onLogout }) {
         <div className="logo">THE 4TH EDGE</div>
         <h1>⚠️ 프로필 오류</h1>
         <div className="err" style={{ marginTop: 20 }}>{message}</div>
-        <p style={{ color: "#a0b8c8", fontSize: 13, lineHeight: 1.6, marginBottom: 20 }}>
-          Supabase 대시보드 → SQL Editor에서 v0_2_setup.sql의 users INSERT 구문을 실행했는지 확인하세요.
-        </p>
         <button className="ghost" onClick={onLogout}>로그아웃</button>
       </div>
     </div>
   );
 }
-
-// ====== 로딩 뷰 ======
 function LoadingView() {
   return (
     <div className="center">
@@ -414,7 +632,7 @@ function LoadingView() {
   );
 }
 
-// ====== 앱 본체 ======
+// ==================== 앱 본체 ====================
 function App() {
   const supabase = useSupabase();
   const [session, setSession] = useState(null);
@@ -424,93 +642,60 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [profileErr, setProfileErr] = useState("");
 
-  // 세션 구독
   useEffect(() => {
     if (!supabase) return;
     let mounted = true;
-
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
-      setSession(data.session);
-      setLoading(false);
+      setSession(data.session); setLoading(false);
     });
-
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
-      if (!s) {
-        setProfile(null);
-        setCompanies([]);
-        setPicked(null);
-        setProfileErr("");
-      }
+      if (!s) { setProfile(null); setCompanies([]); setPicked(null); setProfileErr(""); }
     });
     return () => { mounted = false; sub.subscription.unsubscribe(); };
   }, [supabase]);
 
-  // 프로필 + 회사 로드
   useEffect(() => {
     if (!supabase || !session) return;
     let alive = true;
     (async () => {
       setProfileErr("");
-      // 1) users 프로필
       const { data: prof, error: pe } = await supabase
         .from("users")
         .select("id, email, full_name, role, companies")
         .eq("id", session.user.id)
         .maybeSingle();
-
       if (!alive) return;
-
-      if (pe) {
-        setProfileErr("users 테이블 조회 실패: " + pe.message);
-        return;
-      }
-      if (!prof) {
-        setProfileErr(`users 테이블에 ${session.user.email} 프로필이 없습니다. SQL로 INSERT 필요.`);
-        return;
-      }
+      if (pe) { setProfileErr("users 조회 실패: " + pe.message); return; }
+      if (!prof) { setProfileErr(`users 테이블에 ${session.user.email} 프로필이 없습니다.`); return; }
       setProfile(prof);
 
-      // 2) 회사 목록
       let q = supabase.from("companies").select("id, code, name").order("name");
-      if (prof.role !== "consultant") {
-        q = q.in("id", prof.companies || []);
-      }
+      if (prof.role !== "consultant") q = q.in("id", prof.companies || []);
       const { data: cs, error: ce } = await q;
       if (!alive) return;
-      if (ce) {
-        setProfileErr("companies 조회 실패: " + ce.message);
-        return;
-      }
+      if (ce) { setProfileErr("companies 조회 실패: " + ce.message); return; }
       setCompanies(cs || []);
       if ((cs || []).length === 1) setPicked(cs[0]);
     })();
     return () => { alive = false; };
   }, [supabase, session]);
 
-  async function handleLogout() {
-    if (supabase) await supabase.auth.signOut();
-  }
+  async function handleLogout() { if (supabase) await supabase.auth.signOut(); }
 
   if (!supabase || loading) return <LoadingView />;
   if (!session) return <LoginView supabase={supabase} />;
   if (profileErr) return <ErrorView message={profileErr} onLogout={handleLogout} />;
   if (!profile) return <LoadingView />;
   if (!picked) return (
-    <CompanyPickerView
-      profile={profile}
-      companies={companies}
-      onPick={setPicked}
-      onLogout={handleLogout}
-    />
+    <CompanyPickerView profile={profile} companies={companies}
+      onPick={setPicked} onLogout={handleLogout} />
   );
   return (
     <DashboardShell
-      profile={profile}
-      company={picked}
-      onChangeCompany={() => setPicked(null)}
-      onLogout={handleLogout}
+      profile={profile} company={picked} supabase={supabase}
+      onChangeCompany={() => setPicked(null)} onLogout={handleLogout}
     />
   );
 }
