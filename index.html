@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The 4th Edge · ESG 플랫폼 v2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    padding: 20px;
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 60px 50px;
+    max-width: 640px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .logo {
+    font-size: 14px;
+    letter-spacing: 6px;
+    color: #88ccff;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 42px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: #bbb;
+    margin-bottom: 50px;
+    line-height: 1.5;
+  }
+  .status-box {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: left;
+    margin-bottom: 30px;
+    font-family: "Consolas", monospace;
+    font-size: 14px;
+  }
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .status-row:last-child { border-bottom: none; }
+  .status-label { color: #888; }
+  .status-value { color: #88ccff; font-weight: 600; }
+  .status-ok { color: #4ade80; }
+  .status-pending { color: #fbbf24; }
+  .version {
+    font-size: 12px;
+    color: #666;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">THE 4TH EDGE</div>
+    <h1>ESG 플랫폼 v2</h1>
+    <p class="subtitle">
+      차세대 ESG 데이터 관리 · 보고 플랫폼<br>
+      GRI 2025 신규표준 · ESRS IG1 · 이중중요성평가 v2
+    </p>
+
+    <div class="status-box">
+      <div class="status-row">
+        <span class="status-label">Platform</span>
+        <span class="status-value">the4thedge-esg-v2</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Version</span>
+        <span class="status-value">v0.1 · 초기 세팅</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Deployment</span>
+        <span class="status-ok">● Vercel 연결됨</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Database</span>
+        <span class="status-pending" id="db-status">● 연결 확인 중…</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Build</span>
+        <span class="status-value" id="build-time">-</span>
+      </div>
+    </div>
+
+    <div class="version">CONSTRUCTION IN PROGRESS · Q2 2026</div>
+  </div>
+
+<script type="module">
+  // Supabase 연결 테스트
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const SUPABASE_URL = "https://ucqqckuzuaeceuabndjw.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_YsX59YkLF5vtK83k2DPxBg_6eM0Kev0";
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // 단순 ping (auth 상태만 확인)
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    document.getElementById("db-status").textContent = "● Supabase 연결됨";
+    document.getElementById("db-status").className = "status-ok";
+  } catch (e) {
+    document.getElementById("db-status").textContent = "● 연결 실패: " + e.message;
+  }
+
+  // Build time
+  document.getElementById("build-time").textContent = new Date().toISOString().slice(0,16).replace("T"," ");
+</script>
+</body>
+</html>
