@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v0.5</title>
+<title>The 4th Edge · ESG 플랫폼 v0.6</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -279,7 +279,7 @@
   }
   @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-  /* ===== v0.5: 입력폼 ===== */
+  /* ===== v0.5: 입력폼 · v0.6: 이중중요성평가 추가 ===== */
   .edit-toolbar {
     display: flex; gap: 20px; align-items: center;
     margin-bottom: 24px; padding: 14px 16px;
@@ -420,13 +420,60 @@
   .empty-note {
     color: #6b8290; font-size: 13px; padding: 8px 0;
   }
+  /* ===== v0.6: 이중중요성평가 라이트 테마 ===== */
+  .main-light {
+    background: #f9fafb !important;
+    color: #111827;
+  }
+  .main-light h2 { color: #111827; }
+  .main-light p { color: #374151; }
+  .mat-tabs {
+    display: flex; gap: 2px;
+    background: #fff;
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    overflow-x: auto;
+    margin-bottom: 18px;
+  }
+  .mat-tab {
+    flex: 1;
+    min-width: 110px;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 7px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .mat-tab:hover { background: #f3f4f6; color: #111827; }
+  .mat-tab.active {
+    background: #111827;
+    color: #fff;
+    font-weight: 600;
+  }
+  .mat-saving {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 500;
+    padding: 3px 10px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+  }
+  .mat-saving.saving { color: #d97706; border-color: #fcd34d; background: #fffbeb; }
+  .mat-saving.saved { color: #059669; border-color: #a7f3d0; background: #ecfdf5; }
 </style>
 </head>
 <body>
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo } = React;
+const { useState, useEffect, useMemo, useRef } = React;
 
 const SUPABASE_URL = "https://ucqqckuzuaeceuabndjw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_YsX59YkLF5vtK83k2DPxBg_6eM0Kev0";
@@ -511,7 +558,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v0.5 · 데이터 입력</div>
+        <div className="muted">v0.6 · 이중중요성평가</div>
       </div>
     </div>
   );
@@ -1107,6 +1154,13 @@ function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout 
     return () => { alive = false; };
   }, [supabase, company.id]);
 
+  // v0.6: 이중중요성평가 카테고리 판별
+  const isMateriality = selected && (
+    selected.code === 'materiality_v2' ||
+    selected.code === 'materiality' ||
+    /이중중요성|이중중대성|중요성평가|중대성평가/.test(selected.name || '')
+  );
+
   return (
     <div className="app-layout">
       <Sidebar
@@ -1118,10 +1172,12 @@ function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout 
         onChangeCompany={onChangeCompany}
         onLogout={onLogout}
       />
-      <main className="main">
+      <main className={`main ${isMateriality ? 'main-light' : ''}`}>
         {loadErr && <div className="err">{loadErr}</div>}
         {selected
-          ? <CategoryPane category={selected} company={company} supabase={supabase} profile={profile} />
+          ? (isMateriality
+              ? <MaterialityPanel category={selected} company={company} supabase={supabase} profile={profile} />
+              : <CategoryPane category={selected} company={company} supabase={supabase} profile={profile} />)
           : <WelcomePane company={company} categoriesCount={categories.length} />}
       </main>
     </div>
@@ -1247,6 +1303,988 @@ function App() {
       profile={profile} company={picked} supabase={supabase}
       onChangeCompany={() => setPicked(null)} onLogout={handleLogout}
     />
+  );
+}
+
+// ==========================================================================
+// v0.6 이중중요성평가 모듈
+// GRI 3 Material Topics 2021 · ESRS 1 · VSME · K-ESG 준수
+// ==========================================================================
+
+const MATERIALITY_TOPICS = [
+  { code: "E1", cat: "환경", color: "emerald", title: "기후변화·온실가스",
+    desc: "사업장·가치사슬에서 발생하는 Scope 1/2/3 온실가스 배출과 기후 리스크 관리",
+    gri: ["GRI 305", "GRI 102"], kesg: ["E-1", "E-2-1", "E-2-2"] },
+  { code: "E2", cat: "환경", color: "emerald", title: "에너지 관리",
+    desc: "전력·연료·신재생 사용량과 에너지 효율 개선",
+    gri: ["GRI 302", "GRI 103"], kesg: ["E-3", "E-4"] },
+  { code: "E3", cat: "환경", color: "emerald", title: "용수·폐수",
+    desc: "취수·사용·방류 전 과정의 수자원 관리",
+    gri: ["GRI 303"], kesg: ["E-5-1", "E-5-2"] },
+  { code: "E4", cat: "환경", color: "emerald", title: "폐기물·순환경제",
+    desc: "폐기물 발생·재활용·처분 관리 및 자원 순환",
+    gri: ["GRI 306"], kesg: ["E-6"] },
+  { code: "E5", cat: "환경", color: "emerald", title: "대기오염·유해물질",
+    desc: "NOx·SOx·먼지 등 대기오염물질 및 유해화학물질 관리",
+    gri: ["GRI 305", "GRI 306"], kesg: ["E-7"] },
+  { code: "E6", cat: "환경", color: "emerald", title: "원자재·자원 효율",
+    desc: "원자재 사용량·재생원료 비율·자원 효율성",
+    gri: ["GRI 301"], kesg: ["E-8"] },
+  { code: "S1", cat: "사회", color: "blue", title: "임직원 안전·보건",
+    desc: "산업안전·직업병 예방·비상 대응",
+    gri: ["GRI 403"], kesg: ["S-5", "S-6"] },
+  { code: "S2", cat: "사회", color: "blue", title: "교육·인재 육성",
+    desc: "임직원 역량 개발·경력 관리·리더 양성",
+    gri: ["GRI 404"], kesg: ["S-4"] },
+  { code: "S3", cat: "사회", color: "blue", title: "다양성·공정 처우",
+    desc: "성별·세대·장애 등 다양성 및 차별 금지",
+    gri: ["GRI 405", "GRI 406"], kesg: ["S-3"] },
+  { code: "S4", cat: "사회", color: "blue", title: "공급망 노동·인권",
+    desc: "협력사 근로자 인권·아동·강제노동 방지·공급망 실사",
+    gri: ["GRI 408", "GRI 409", "GRI 414"], kesg: ["S-8"] },
+  { code: "S5", cat: "사회", color: "blue", title: "지역사회·고객 안전",
+    desc: "지역사회 영향·기여 및 제품 안전",
+    gri: ["GRI 413", "GRI 416"], kesg: ["S-9", "S-10"] },
+  { code: "G1", cat: "지배구조", color: "violet", title: "윤리·반부패",
+    desc: "부패 방지·준법·내부 통제",
+    gri: ["GRI 205"], kesg: ["G-4"] },
+  { code: "G2", cat: "지배구조", color: "violet", title: "정보보호·데이터 보안",
+    desc: "개인정보·영업기밀·사이버 보안",
+    gri: ["GRI 418"], kesg: ["G-6"] },
+  { code: "G3", cat: "지배구조", color: "violet", title: "제품 품질·책임",
+    desc: "제품 품질·안전·고객 만족",
+    gri: ["GRI 416", "GRI 417"], kesg: ["G-5"] },
+  { code: "G4", cat: "지배구조", color: "violet", title: "공급망 투명성",
+    desc: "공급망 ESG 평가·공정 거래·리스크 관리",
+    gri: ["GRI 308", "GRI 414"], kesg: ["G-7"] },
+];
+
+const INDUSTRY_BENCHMARK = {
+  E1: { impact: 0.72, financial: 0.55, n: 6 },
+  E2: { impact: 0.65, financial: 0.50, n: 6 },
+  E3: { impact: 0.48, financial: 0.32, n: 6 },
+  E4: { impact: 0.55, financial: 0.42, n: 6 },
+  E5: { impact: 0.52, financial: 0.38, n: 6 },
+  E6: { impact: 0.58, financial: 0.50, n: 6 },
+  S1: { impact: 0.62, financial: 0.48, n: 6 },
+  S2: { impact: 0.42, financial: 0.38, n: 6 },
+  S3: { impact: 0.45, financial: 0.32, n: 5 },
+};
+
+const LIKERT5_MAP = { 0: 0, 1: 0.2, 2: 0.4, 3: 0.6, 4: 0.8, 5: 1.0 };
+
+const SCALE_OPTS = [
+  { v: 1, label: "매우 낮음", desc: "영향 범위가 극히 제한적 (단일 부서·소수)" },
+  { v: 2, label: "낮음", desc: "영향이 국소적 (단일 사업장 일부)" },
+  { v: 3, label: "중간", desc: "영향이 사업장 전체 또는 지역 일부" },
+  { v: 4, label: "높음", desc: "영향이 여러 사업장·지역 사회" },
+  { v: 5, label: "매우 높음", desc: "영향이 광범위 (국가·국제적)" },
+];
+const SCOPE_OPTS = [
+  { v: 1, label: "매우 좁음", desc: "직접 운영만 영향" },
+  { v: 2, label: "좁음", desc: "운영 + 일부 협력사" },
+  { v: 3, label: "중간", desc: "운영 + 주요 공급망" },
+  { v: 4, label: "넓음", desc: "전 가치사슬 (상류+하류 일부)" },
+  { v: 5, label: "매우 넓음", desc: "전 가치사슬 + 사용·폐기 단계" },
+];
+const IRREM_OPTS = [
+  { v: 1, label: "즉시 회복", desc: "단기간 내 복구 가능" },
+  { v: 2, label: "쉽게 회복", desc: "1년 이내 복구 가능" },
+  { v: 3, label: "중간", desc: "1~5년 복구 기간 필요" },
+  { v: 4, label: "어려움", desc: "5년 이상 장기 복구" },
+  { v: 5, label: "회복 불가", desc: "영구적·비가역적 영향" },
+];
+const LIKELIHOOD_OPTS = [
+  { v: 1, label: "매우 낮음", desc: "<10% · 희박" },
+  { v: 2, label: "낮음", desc: "10~30% · 드문 편" },
+  { v: 3, label: "보통", desc: "30~50% · 가능" },
+  { v: 4, label: "높음", desc: "50~80% · 개연성 있음" },
+  { v: 5, label: "매우 높음", desc: ">80% · 거의 확실" },
+];
+const FIN_IMPACT_OPTS = [
+  { v: 1, label: "매우 낮음", desc: "매출 1% 미만" },
+  { v: 2, label: "낮음", desc: "매출 1~3%" },
+  { v: 3, label: "중간", desc: "매출 3~5%" },
+  { v: 4, label: "높음", desc: "매출 5~10%" },
+  { v: 5, label: "매우 높음", desc: "매출 10% 이상 · 사업모델 영향" },
+];
+
+const VALUE_CHAIN_STAGES = [
+  { key: "upstream_raw", label: "원재료·부품 조달", desc: "공급업체·원자재" },
+  { key: "upstream_logi", label: "물류 (상류)", desc: "자재 운송" },
+  { key: "own_ops", label: "자체 운영 (생산·사무)", desc: "우리 사업장" },
+  { key: "downstream_logi", label: "물류 (하류)", desc: "제품 배송" },
+  { key: "downstream_use", label: "고객 사용", desc: "제품 사용 단계" },
+  { key: "downstream_eol", label: "폐기·재활용", desc: "제품 수명 종료" },
+];
+
+// ==========================================================================
+// 계산 로직
+// ==========================================================================
+function calcSeverity(scale, scope, irrem) {
+  if (!scale || !scope || !irrem) return 0;
+  const geo = Math.pow(scale * scope * irrem, 1/3);
+  return geo / 5;
+}
+function calcImpact(resp) {
+  if (!resp || !resp.applicable) return 0;
+  const severity = calcSeverity(resp.scale, resp.scope, resp.irrem);
+  const likelihood = resp.isActual ? 1.0 : LIKERT5_MAP[resp.likelihood] || 0;
+  return severity * likelihood;
+}
+function calcFinancial(resp) {
+  if (!resp || !resp.applicable) return 0;
+  const impact = LIKERT5_MAP[resp.finImpact] || 0;
+  const likelihood = LIKERT5_MAP[resp.finLikelihood] || 0;
+  return impact * likelihood;
+}
+function calculateMaterialityV2(responses, thresholdMode) {
+  const applicable = MATERIALITY_TOPICS.filter(t => {
+    const r = responses[t.code];
+    return r && r.applicable && r.scale > 0 && r.scope > 0 && r.irrem > 0 && r.finImpact > 0 && r.finLikelihood > 0;
+  });
+  const scored = applicable.map(t => {
+    const r = responses[t.code];
+    const impact = calcImpact(r);
+    const financial = calcFinancial(r);
+    const maxAxis = Math.max(impact, financial);
+    const avgAxis = (impact + financial) / 2;
+    return {
+      code: t.code, title: t.title, cat: t.cat, color: t.color,
+      gri: t.gri, kesg: t.kesg,
+      impact, financial, maxAxis, avgAxis,
+      severity: calcSeverity(r.scale, r.scope, r.irrem),
+      isActual: r.isActual, scale: r.scale, scope: r.scope, irrem: r.irrem,
+      likelihood: r.likelihood, finImpact: r.finImpact, finLikelihood: r.finLikelihood,
+    };
+  });
+  scored.sort((a, b) => b.maxAxis - a.maxAxis);
+  const mode = thresholdMode || "top35";
+  const n = scored.length;
+  let core = [], manage = [], monitor = [];
+  if (mode === "top35") {
+    const coreCount = Math.max(1, Math.ceil(n * 0.35));
+    const manageCount = Math.max(1, Math.ceil(n * 0.35));
+    core = scored.slice(0, coreCount);
+    manage = scored.slice(coreCount, coreCount + manageCount);
+    monitor = scored.slice(coreCount + manageCount);
+  } else if (mode === "axis06") {
+    core = scored.filter(s => s.maxAxis >= 0.6);
+    manage = scored.filter(s => s.maxAxis >= 0.3 && s.maxAxis < 0.6);
+    monitor = scored.filter(s => s.maxAxis < 0.3);
+  } else if (mode === "both05") {
+    core = scored.filter(s => s.impact >= 0.5 && s.financial >= 0.5);
+    manage = scored.filter(s => !(s.impact >= 0.5 && s.financial >= 0.5) && (s.impact >= 0.3 || s.financial >= 0.3));
+    monitor = scored.filter(s => s.impact < 0.3 && s.financial < 0.3);
+  }
+  return { all: scored, core, manage, monitor };
+}
+function detectAnomalies(responses) {
+  const anomalies = [];
+  MATERIALITY_TOPICS.forEach(t => {
+    const r = responses[t.code];
+    if (!r) return;
+    const impact = calcImpact(r);
+    const financial = calcFinancial(r);
+    if (r.applicable && (!r.scale) && (!r.scope) && (!r.irrem) && (!r.finImpact)) {
+      anomalies.push({ type: "zero_all", severity: "high", code: t.code, title: t.title,
+        msg: "해당된다고 표시하셨으나 평가 항목이 모두 비어있습니다. 재검토가 필요합니다." });
+      return;
+    }
+    if (r.applicable && impact > 0 && financial > 0) {
+      const gap = Math.abs(impact - financial);
+      if (gap >= 0.4) anomalies.push({ type: "gap", severity: "medium", code: t.code, title: t.title,
+        msg: `영향(${(impact*100).toFixed(0)}점)과 재무(${(financial*100).toFixed(0)}점) 점수 괴리가 큽니다 (${(gap*100).toFixed(0)}점). 재무 영향 관점을 다시 검토해보세요.` });
+    }
+    const bm = INDUSTRY_BENCHMARK[t.code];
+    if (bm && r.applicable && impact > 0) {
+      if (impact < bm.impact - 0.3) anomalies.push({ type: "below_industry_impact", severity: "medium", code: t.code, title: t.title,
+        msg: `영향 평가(${(impact*100).toFixed(0)}점)가 업계 평균(${(bm.impact*100).toFixed(0)}점)보다 30점 이상 낮습니다. 동종 업계 관점에서 재검토가 필요합니다.` });
+      if (financial < bm.financial - 0.3) anomalies.push({ type: "below_industry_fin", severity: "medium", code: t.code, title: t.title,
+        msg: `재무 평가(${(financial*100).toFixed(0)}점)가 업계 평균(${(bm.financial*100).toFixed(0)}점)보다 30점 이상 낮습니다. 규제·고객 요구 변화를 고려하세요.` });
+    }
+    if ((t.code === "E1" || t.code === "S1") && r.applicable && impact < 0.4 && financial < 0.4) {
+      anomalies.push({ type: "core_too_low", severity: "high", code: t.code, title: t.title,
+        msg: `제조업 공통 핵심 이슈인 「${t.title}」이(가) 영향·재무 모두 40점 미만으로 평가되었습니다. 근거 재확인이 필요합니다.` });
+    }
+    if ((t.code === "E1" || t.code === "S1" || t.code === "E5") && r.applicable === false) {
+      anomalies.push({ type: "mandatory_excluded", severity: "high", code: t.code, title: t.title,
+        msg: `제조업에서 「${t.title}」은 일반적으로 필수 평가 대상입니다. '해당 없음' 사유를 명확히 하거나 재검토를 권장합니다.` });
+    }
+    if (r.applicable && r.scale && r.scope && r.irrem) {
+      const vals = [r.scale, r.scope, r.irrem];
+      const max = Math.max(...vals), min = Math.min(...vals);
+      if (max - min >= 3) anomalies.push({ type: "severity_inconsistent", severity: "low", code: t.code, title: t.title,
+        msg: `Scale(${r.scale})·Scope(${r.scope})·회복불가능성(${r.irrem}) 평가 편차가 큽니다. 논리적 일관성을 재확인해주세요.` });
+    }
+  });
+  return anomalies;
+}
+function generateReportParagraphsV2(result, meta) {
+  const { core, manage } = result;
+  const stakeholder = meta.stakeholderNotes || "";
+  const valueChain = meta.valueChain || {};
+  const threshold = meta.threshold || "top35";
+  const thresholdDesc = {
+    "top35": "평가된 주제 중 상위 35%를 핵심 이슈로 선정",
+    "axis06": "영향·재무 중 한 축이라도 0.6 이상인 주제를 핵심 이슈로 선정 (GRI 3 권장)",
+    "both05": "영향·재무 두 축이 모두 0.5 이상인 주제를 핵심 이슈로 선정"
+  }[threshold];
+  const methodology = `당사는 GRI 3: Material Topics 2021의 공식 4단계 절차에 따라 이중중대성평가를 수행하였습니다. 영향 중요도(Impact Materiality)는 Scale(규모)·Scope(범위)·Irremediable character(회복불가능성)의 3요소로 심각도(Severity)를 산정하고, 잠재적 영향에 대해서는 발생 가능성(Likelihood)을 추가 반영하였습니다. 재무 중요도(Financial Materiality)는 재무적 영향의 규모와 발생 가능성을 2요소로 평가하였습니다. ESRS 1 Materiality Assessment 및 K-ESG 가이드라인을 참조하여 15개 주제를 선정하였으며, ${thresholdDesc}하였습니다.`;
+  const vcStages = Object.entries(valueChain).filter(([k,v]) => v).map(([k]) => {
+    return VALUE_CHAIN_STAGES.find(s => s.key === k)?.label;
+  }).filter(Boolean);
+  const valueChainText = vcStages.length > 0 ?
+    `가치사슬 전반(${vcStages.join(", ")})에 대한 영향 매핑을 수행하였으며, 각 단계의 주요 영향·리스크·기회를 식별하였습니다.` : "";
+  let coreText = "";
+  if (core.length > 0) {
+    const coreList = core.map(c => `「${c.title}」`).join(", ");
+    coreText = `평가 결과, ${coreList} 등 ${core.length}개 주제가 당사의 핵심 중요 이슈로 도출되었습니다.`;
+  }
+  const coreDetails = core.map(c => {
+    return `■ ${c.title} (${c.code})\n  · GRI 연계: ${c.gri.join(", ")}\n  · K-ESG 항목: ${c.kesg.join(", ")}\n  · 영향 중요도: ${(c.impact * 100).toFixed(0)}점 (Severity ${(c.severity * 100).toFixed(0)}점)\n  · 재무 중요도: ${(c.financial * 100).toFixed(0)}점\n  · 종합: 영향·재무 중 최대값 ${(c.maxAxis * 100).toFixed(0)}점`;
+  }).join("\n\n");
+  let manageText = "";
+  if (manage.length > 0) {
+    const mList = manage.map(m => `「${m.title}」`).join(", ");
+    manageText = `${mList}는 관리 이슈로 분류되어, 지속적 모니터링 및 개선 활동을 통해 리스크를 관리해 나갈 계획입니다.`;
+  }
+  return { methodology, valueChainText, coreText, coreDetails, manageText, stakeholder };
+}
+
+// ==========================================================================
+// SVG 매트릭스
+// ==========================================================================
+function MaterialityMatrixV2({ result, width = 640, height = 480 }) {
+  const padding = { top: 40, right: 40, bottom: 60, left: 70 };
+  const plotW = width - padding.left - padding.right;
+  const plotH = height - padding.top - padding.bottom;
+  const xScale = v => padding.left + v * plotW;
+  const yScale = v => padding.top + (1 - v) * plotH;
+  const colorMap = { emerald: "#10b981", blue: "#3b82f6", violet: "#8b5cf6" };
+  return (
+    <svg width={width} height={height} style={{ background: "#fafafa", borderRadius: 8 }}>
+      <rect x={padding.left + plotW * 0.5} y={padding.top} width={plotW * 0.5} height={plotH * 0.5} fill="#fef3c7" opacity="0.3" />
+      <text x={padding.left + plotW * 0.75} y={padding.top + 20} textAnchor="middle" fontSize="11" fill="#92400e" fontWeight="700">핵심 이슈 영역</text>
+      <line x1={xScale(0.5)} y1={padding.top} x2={xScale(0.5)} y2={padding.top + plotH} stroke="#e5e7eb" strokeDasharray="4,4" />
+      <line x1={padding.left} y1={yScale(0.5)} x2={padding.left + plotW} y2={yScale(0.5)} stroke="#e5e7eb" strokeDasharray="4,4" />
+      <line x1={padding.left} y1={padding.top + plotH} x2={padding.left + plotW} y2={padding.top + plotH} stroke="#6b7280" strokeWidth="1.5" />
+      <line x1={padding.left} y1={padding.top} x2={padding.left} y2={padding.top + plotH} stroke="#6b7280" strokeWidth="1.5" />
+      <text x={padding.left + plotW / 2} y={height - 15} textAnchor="middle" fontSize="12" fill="#374151" fontWeight="600">환경·사회 영향 (Impact) →</text>
+      <text x={20} y={padding.top + plotH / 2} textAnchor="middle" fontSize="12" fill="#374151" fontWeight="600" transform={`rotate(-90, 20, ${padding.top + plotH / 2})`}>재무 영향 (Financial) →</text>
+      {result.all.map((d) => {
+        const cx = xScale(d.impact);
+        const cy = yScale(d.financial);
+        const isCore = result.core.some(c => c.code === d.code);
+        return (
+          <g key={d.code}>
+            <circle cx={cx} cy={cy} r={isCore ? 10 : 7} fill={colorMap[d.color]} opacity={isCore ? 0.9 : 0.55} stroke="#fff" strokeWidth="2" />
+            <text x={cx} y={cy + 3} textAnchor="middle" fontSize="9" fill="#fff" fontWeight="700">{d.code}</text>
+          </g>
+        );
+      })}
+      {(() => {
+        const bms = Object.values(INDUSTRY_BENCHMARK);
+        if (bms.length === 0) return null;
+        const avgImpact = bms.reduce((s, b) => s + b.impact, 0) / bms.length;
+        const avgFinancial = bms.reduce((s, b) => s + b.financial, 0) / bms.length;
+        return (
+          <g>
+            <line x1={xScale(avgImpact)} y1={padding.top} x2={xScale(avgImpact)} y2={padding.top + plotH} stroke="#9ca3af" strokeDasharray="2,3" opacity="0.6" />
+            <line x1={padding.left} y1={yScale(avgFinancial)} x2={padding.left + plotW} y2={yScale(avgFinancial)} stroke="#9ca3af" strokeDasharray="2,3" opacity="0.6" />
+            <text x={xScale(avgImpact) + 4} y={padding.top + 12} fontSize="9" fill="#6b7280">업계 평균</text>
+          </g>
+        );
+      })()}
+    </svg>
+  );
+}
+
+// ==========================================================================
+// MaterialityPanel (v0.6) - Supabase materiality_sessions에 자동 저장
+// ==========================================================================
+const MAT_KEY = "materiality_v2";
+const MAT_SUBS = [
+  { key: 'valuechain', icon: '🔗', label: '1. 가치사슬' },
+  { key: 'topics', icon: '📋', label: '2. 주제 진단' },
+  { key: 'assess', icon: '⚖️', label: '3. 이중 평가' },
+  { key: 'anomaly', icon: '⚠️', label: '4. 이상치' },
+  { key: 'matrix', icon: '📊', label: '5. 매트릭스' },
+  { key: 'confirm', icon: '✅', label: '6. 확정' },
+  { key: 'report', icon: '📝', label: '7. 보고서' },
+];
+
+function MaterialityPanel({ category, company, supabase, profile }) {
+  const [data, setData] = useState({
+    responses: {},
+    meta: { valueChain: {}, threshold: 'top35', stakeholderNotes: '' },
+    confirmed: false,
+    confirmedAt: null,
+    coreTopics: [],
+    history: [],
+  });
+  const [subPage, setSubPage] = useState('valuechain');
+  const [loading, setLoading] = useState(true);
+  const [saveState, setSaveState] = useState('idle'); // idle|saving|saved|error
+  const saveTimerRef = useRef(null);
+  const dirtyRef = useRef(false);
+
+  // 로드
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setLoading(true);
+      const { data: row, error } = await supabase
+        .from('materiality_sessions')
+        .select('session_data, confirmed, confirmed_at')
+        .eq('company_id', company.id)
+        .maybeSingle();
+      if (!alive) return;
+      if (error) {
+        console.error('materiality load error', error);
+        setLoading(false);
+        return;
+      }
+      if (row && row.session_data) {
+        const sd = row.session_data;
+        setData({
+          responses: sd.responses || {},
+          meta: sd.meta || { valueChain: {}, threshold: 'top35', stakeholderNotes: '' },
+          coreTopics: sd.coreTopics || [],
+          history: sd.history || [],
+          confirmed: row.confirmed || false,
+          confirmedAt: row.confirmed_at || null,
+        });
+      }
+      setLoading(false);
+    })();
+    return () => { alive = false; };
+  }, [company.id, supabase]);
+
+  // 저장 (debounce 700ms)
+  useEffect(() => {
+    if (loading) return;
+    if (!dirtyRef.current) return;
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    setSaveState('saving');
+    saveTimerRef.current = setTimeout(async () => {
+      const payload = {
+        company_id: company.id,
+        session_data: {
+          responses: data.responses,
+          meta: data.meta,
+          coreTopics: data.coreTopics,
+          history: data.history,
+        },
+        confirmed: data.confirmed,
+        confirmed_at: data.confirmedAt,
+        updated_at: new Date().toISOString(),
+      };
+      const { error } = await supabase
+        .from('materiality_sessions')
+        .upsert(payload, { onConflict: 'company_id' });
+      if (error) {
+        console.error('materiality save error', error);
+        setSaveState('error');
+      } else {
+        setSaveState('saved');
+        dirtyRef.current = false;
+      }
+    }, 700);
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
+  }, [data, loading, company.id, supabase]);
+
+  // compat wrapper (ConfirmPage·ReportPage가 쓰는 setBlockData)
+  const setBlockDataCompat = (key, payload) => {
+    if (payload && payload.content_json) {
+      dirtyRef.current = true;
+      setData(payload.content_json);
+    }
+  };
+
+  // helpers
+  const updateResponse = (code, patch) => {
+    dirtyRef.current = true;
+    setData(d => ({ ...d, responses: { ...d.responses, [code]: { ...(d.responses[code] || {}), ...patch } } }));
+  };
+  const clearResponse = (code) => {
+    dirtyRef.current = true;
+    setData(d => {
+      const next = { ...d.responses };
+      delete next[code];
+      return { ...d, responses: next };
+    });
+  };
+  const updateMeta = (patch) => {
+    dirtyRef.current = true;
+    setData(d => ({ ...d, meta: { ...d.meta, ...patch } }));
+  };
+
+  if (loading) {
+    return <div style={{ padding: 40, textAlign: 'center', color: '#6b7280' }}>이중중요성평가 세션을 불러오는 중...</div>;
+  }
+
+  const saveLabel = saveState === 'saving' ? '저장 중…' : saveState === 'saved' ? '✓ 저장됨' : saveState === 'error' ? '⚠ 저장 실패' : '';
+  const saveCls = saveState === 'saving' ? 'mat-saving saving' : saveState === 'saved' ? 'mat-saving saved' : 'mat-saving';
+
+  return (
+    <div style={{ padding: '24px 32px', maxWidth: 1200 }}>
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: '#111827', margin: 0 }}>🎯 이중중요성평가 v2</h2>
+          {saveLabel && <span className={saveCls}>{saveLabel}</span>}
+          {data.confirmed && <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#059669', padding: '3px 10px', borderRadius: 4 }}>🔒 확정됨</span>}
+        </div>
+        <p style={{ fontSize: 13, color: '#6b7280' }}>GRI 3 Material Topics 2021 · ESRS 1 · VSME · K-ESG · {company.name}</p>
+      </div>
+      <div className="mat-tabs">
+        {MAT_SUBS.map(s => (
+          <button key={s.key}
+            className={`mat-tab ${subPage === s.key ? 'active' : ''}`}
+            onClick={() => setSubPage(s.key)}>
+            <span style={{ marginRight: 4 }}>{s.icon}</span>{s.label}
+          </button>
+        ))}
+      </div>
+      <div>
+        {subPage === 'valuechain' && <ValueChainPage meta={data.meta} updateMeta={updateMeta} />}
+        {subPage === 'topics' && <TopicsPage responses={data.responses} updateResponse={updateResponse} />}
+        {subPage === 'assess' && <AssessPage responses={data.responses} updateResponse={updateResponse} clearResponse={clearResponse} />}
+        {subPage === 'anomaly' && <AnomalyPage responses={data.responses} />}
+        {subPage === 'matrix' && <MatrixPage responses={data.responses} meta={data.meta} updateMeta={updateMeta} />}
+        {subPage === 'confirm' && <ConfirmPage responses={data.responses} data={data} setBlockData={setBlockDataCompat} MAT_KEY={MAT_KEY} meta={data.meta} />}
+        {subPage === 'report' && <ReportPage responses={data.responses} data={data} setBlockData={setBlockDataCompat} MAT_KEY={MAT_KEY} meta={data.meta} updateMeta={updateMeta} />}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================================================
+// 1단계: 가치사슬 매핑
+// ==========================================================================
+function ValueChainPage({ meta, updateMeta }) {
+  const vc = meta.valueChain || {};
+  const toggleStage = (key) => updateMeta({ valueChain: { ...vc, [key]: !vc[key] } });
+  const checkedCount = Object.values(vc).filter(Boolean).length;
+  return (
+    <div style={{ maxWidth: 900 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>🔗 1단계: 가치사슬 매핑</h3>
+          {checkedCount > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#10b981", padding: "3px 10px", borderRadius: 4 }}>✅ 자동저장됨</span>}
+        </div>
+        <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 4 }}>당사의 사업 활동이 영향을 미치는 가치사슬 단계를 체크하세요. <strong>GRI 3의 필수 사전 단계</strong>입니다.</p>
+        <p style={{ fontSize: 12, color: "#9ca3af" }}>선택: {checkedCount} / {VALUE_CHAIN_STAGES.length}</p>
+      </div>
+      <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, padding: 14, marginBottom: 16, fontSize: 12, color: "#1e40af" }}>
+        💡 가치사슬이 넓을수록 영향 범위(Scope) 점수가 높아집니다. 단, 실제 통제·영향력이 있는 단계만 체크하세요.
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+        {VALUE_CHAIN_STAGES.map(s => {
+          const checked = vc[s.key];
+          return (
+            <div key={s.key} onClick={() => toggleStage(s.key)}
+              style={{ cursor: "pointer", background: checked ? "#ecfdf5" : "#fff",
+                border: `2px solid ${checked ? "#10b981" : "#e5e7eb"}`,
+                borderRadius: 8, padding: 14, transition: "all 0.15s" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ width: 20, height: 20, borderRadius: 4,
+                  background: checked ? "#10b981" : "#fff",
+                  border: `2px solid ${checked ? "#10b981" : "#d1d5db"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#fff", fontSize: 12, fontWeight: 700 }}>{checked ? "✓" : ""}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#111827" }}>{s.label}</div>
+                  <div style={{ fontSize: 11, color: "#6b7280", marginTop: 2 }}>{s.desc}</div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================================================
+// 2단계: 주제 진단
+// ==========================================================================
+function TopicsPage({ responses, updateResponse }) {
+  const totalCount = MATERIALITY_TOPICS.length;
+  const checkedCount = MATERIALITY_TOPICS.filter(t => responses[t.code] && responses[t.code].applicable !== undefined).length;
+  return (
+    <div style={{ maxWidth: 980 }}>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>📋 2단계: 주제 진단</h3>
+          {checkedCount > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#10b981", padding: "3px 10px", borderRadius: 4 }}>✅ 자동저장됨</span>}
+        </div>
+        <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 4 }}>우리 회사에 해당하는 ESG 주제를 선택하세요. <strong>"해당 없음"</strong>으로 표시한 주제는 평가에서 제외됩니다.</p>
+        <p style={{ fontSize: 12, color: "#9ca3af" }}>GRI 3 · VSME "if applicable" · 응답: {checkedCount} / {totalCount}</p>
+      </div>
+      {["환경", "사회", "지배구조"].map(cat => {
+        const topics = MATERIALITY_TOPICS.filter(t => t.cat === cat);
+        const catColor = { "환경": "#10b981", "사회": "#3b82f6", "지배구조": "#8b5cf6" }[cat];
+        const catIcon = { "환경": "🌱", "사회": "👥", "지배구조": "⚖️" }[cat];
+        return (
+          <div key={cat} style={{ marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              <span style={{ fontSize: 16 }}>{catIcon}</span>
+              <h4 style={{ fontSize: 15, fontWeight: 700, color: catColor, margin: 0 }}>{cat}</h4>
+              <span style={{ fontSize: 11, color: "#9ca3af" }}>{topics.length}개 주제</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8 }}>
+              {topics.map(t => {
+                const r = responses[t.code] || {};
+                const isApp = r.applicable === true;
+                const isNotApp = r.applicable === false;
+                return (
+                  <div key={t.code} style={{ background: "#fff", border: `1px solid ${isApp ? catColor : "#e5e7eb"}`, borderRadius: 8, padding: 14, opacity: isNotApp ? 0.5 : 1 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: catColor, background: catColor + "15", padding: "2px 6px", borderRadius: 3 }}>{t.code}</span>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>{t.title}</span>
+                        </div>
+                        <p style={{ fontSize: 12, color: "#6b7280", margin: "4px 0", lineHeight: 1.5 }}>{t.desc}</p>
+                        <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 4 }}>GRI: {t.gri.join(" · ")} &nbsp;|&nbsp; K-ESG: {t.kesg.join(" · ")}</div>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 140 }}>
+                        <button onClick={() => updateResponse(t.code, { applicable: true })}
+                          style={{ padding: "6px 10px", fontSize: 12, fontWeight: 600, border: `1.5px solid ${isApp ? catColor : "#e5e7eb"}`, background: isApp ? catColor : "#fff", color: isApp ? "#fff" : "#6b7280", borderRadius: 6, cursor: "pointer" }}>✓ 해당됨</button>
+                        <button onClick={() => updateResponse(t.code, { applicable: false })}
+                          style={{ padding: "6px 10px", fontSize: 12, fontWeight: 600, border: `1.5px solid ${isNotApp ? "#6b7280" : "#e5e7eb"}`, background: isNotApp ? "#6b7280" : "#fff", color: isNotApp ? "#fff" : "#6b7280", borderRadius: 6, cursor: "pointer" }}>✗ 해당 없음</button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ==========================================================================
+// 3단계: 이중 평가
+// ==========================================================================
+function FactorRow({ label, desc, options, value, onChange, color }) {
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 2 }}>{label}</div>
+      <div style={{ fontSize: 10, color: "#9ca3af", marginBottom: 6 }}>{desc}</div>
+      <div style={{ display: "flex", gap: 4 }}>
+        {options.map(opt => (
+          <button key={opt.v} onClick={() => onChange(opt.v)} title={opt.desc}
+            style={{ flex: 1, padding: "6px 4px", fontSize: 10, fontWeight: 600,
+              border: `1.5px solid ${value === opt.v ? color : "#e5e7eb"}`,
+              background: value === opt.v ? color : "#fff",
+              color: value === opt.v ? "#fff" : "#6b7280",
+              borderRadius: 5, cursor: "pointer", lineHeight: 1.2 }}>
+            {opt.v}<br/><span style={{ fontSize: 8 }}>{opt.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AssessPage({ responses, updateResponse, clearResponse }) {
+  const applicable = MATERIALITY_TOPICS.filter(t => responses[t.code] && responses[t.code].applicable === true);
+  const evaluated = applicable.filter(t => {
+    const r = responses[t.code];
+    return r.scale > 0 && r.scope > 0 && r.irrem > 0 && r.finImpact > 0 && r.finLikelihood > 0;
+  }).length;
+  const [expandedCode, setExpandedCode] = useState(null);
+  if (applicable.length === 0) {
+    return (
+      <div style={{ maxWidth: 700, padding: 40, textAlign: "center" }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", marginBottom: 12 }}>평가할 주제가 없습니다</h3>
+        <p style={{ fontSize: 13, color: "#6b7280" }}>먼저 <strong>2단계 주제 진단</strong>에서 해당되는 주제를 선택해주세요.</p>
+      </div>
+    );
+  }
+  return (
+    <div style={{ maxWidth: 980 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>⚖️ 3단계: 이중 평가</h3>
+          {evaluated > 0 && <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#10b981", padding: "3px 10px", borderRadius: 4 }}>✅ 자동저장됨 ({evaluated}/{applicable.length})</span>}
+        </div>
+        <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 4 }}><strong>GRI 3 공식 방법</strong>에 따라 Scale·Scope·Irremediable·Likelihood·Financial 5요소로 평가합니다.</p>
+        <p style={{ fontSize: 12, color: "#9ca3af" }}>진행: {evaluated} / {applicable.length}</p>
+      </div>
+      <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, padding: 14, marginBottom: 16, fontSize: 12, color: "#1e40af" }}>
+        💡 <strong>영향 중요도</strong> = Severity(Scale × Scope × Irremediable) × Likelihood · <strong>재무 중요도</strong> = 재무영향 × 발생가능성
+      </div>
+      {applicable.map(t => {
+        const r = responses[t.code] || {};
+        const catColor = { "환경": "#10b981", "사회": "#3b82f6", "지배구조": "#8b5cf6" }[t.cat];
+        const isComplete = r.scale > 0 && r.scope > 0 && r.irrem > 0 && r.finImpact > 0 && r.finLikelihood > 0;
+        const isExpanded = expandedCode === t.code;
+        const impact = calcImpact(r);
+        const financial = calcFinancial(r);
+        return (
+          <div key={t.code} style={{ background: "#fff", border: `1px solid ${isComplete ? catColor : "#e5e7eb"}`, borderRadius: 8, marginBottom: 10 }}>
+            <div onClick={() => setExpandedCode(isExpanded ? null : t.code)}
+              style={{ padding: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: catColor, background: catColor + "15", padding: "2px 6px", borderRadius: 3 }}>{t.code}</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#111827", flex: 1 }}>{t.title}</span>
+              {isComplete && (
+                <>
+                  <span style={{ fontSize: 11, color: "#6b7280" }}>영향 <strong style={{ color: catColor }}>{(impact*100).toFixed(0)}</strong> / 재무 <strong style={{ color: catColor }}>{(financial*100).toFixed(0)}</strong></span>
+                  <span style={{ fontSize: 10, color: "#fff", background: "#10b981", padding: "2px 6px", borderRadius: 3, fontWeight: 700 }}>✓ 완료</span>
+                </>
+              )}
+              {!isComplete && <span style={{ fontSize: 10, color: "#fff", background: "#f59e0b", padding: "2px 6px", borderRadius: 3, fontWeight: 700 }}>미완료</span>}
+              <span style={{ fontSize: 10, color: "#9ca3af" }}>{isExpanded ? "▲" : "▼"}</span>
+            </div>
+            {isExpanded && (
+              <div style={{ padding: "0 14px 14px 14px", borderTop: "1px solid #f3f4f6" }}>
+                <p style={{ fontSize: 12, color: "#6b7280", marginTop: 12, marginBottom: 16, lineHeight: 1.6 }}>{t.desc}</p>
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#374151", marginBottom: 6 }}>📌 영향 유형</div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button onClick={() => updateResponse(t.code, { isActual: true })}
+                      style={{ flex: 1, padding: "8px 12px", fontSize: 12, fontWeight: 600, border: `1.5px solid ${r.isActual === true ? catColor : "#e5e7eb"}`, background: r.isActual === true ? catColor : "#fff", color: r.isActual === true ? "#fff" : "#6b7280", borderRadius: 5, cursor: "pointer" }}>실제 영향 (이미 발생)</button>
+                    <button onClick={() => updateResponse(t.code, { isActual: false })}
+                      style={{ flex: 1, padding: "8px 12px", fontSize: 12, fontWeight: 600, border: `1.5px solid ${r.isActual === false ? catColor : "#e5e7eb"}`, background: r.isActual === false ? catColor : "#fff", color: r.isActual === false ? "#fff" : "#6b7280", borderRadius: 5, cursor: "pointer" }}>잠재 영향 (발생 가능)</button>
+                  </div>
+                </div>
+                <FactorRow label="① Scale (규모)" desc="영향의 크기·심각성" options={SCALE_OPTS} value={r.scale} onChange={v => updateResponse(t.code, { scale: v })} color={catColor} />
+                <FactorRow label="② Scope (범위)" desc="영향을 받는 대상·지역" options={SCOPE_OPTS} value={r.scope} onChange={v => updateResponse(t.code, { scope: v })} color={catColor} />
+                <FactorRow label="③ Irremediable (회복불가능성)" desc="회복이 어려운 정도" options={IRREM_OPTS} value={r.irrem} onChange={v => updateResponse(t.code, { irrem: v })} color={catColor} />
+                {r.isActual === false && (
+                  <FactorRow label="④ Likelihood (발생 가능성)" desc="잠재 영향 전용" options={LIKELIHOOD_OPTS} value={r.likelihood} onChange={v => updateResponse(t.code, { likelihood: v })} color={catColor} />
+                )}
+                <div style={{ marginTop: 16, padding: 12, background: "#fffbeb", border: "1px solid #fcd34d", borderRadius: 6 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#92400e", marginBottom: 10 }}>💰 재무 중요도 평가</div>
+                  <FactorRow label="⑤ 재무 영향 규모" desc="매출·이익·비용 영향" options={FIN_IMPACT_OPTS} value={r.finImpact} onChange={v => updateResponse(t.code, { finImpact: v })} color="#d97706" />
+                  <FactorRow label="⑥ 재무 발생 가능성" desc="해당 재무 영향이 실제 발생할 확률" options={LIKELIHOOD_OPTS} value={r.finLikelihood} onChange={v => updateResponse(t.code, { finLikelihood: v })} color="#d97706" />
+                </div>
+                {isComplete && (
+                  <div style={{ marginTop: 14, padding: 12, background: "#ecfdf5", border: "1px solid #10b981", borderRadius: 6, fontSize: 12 }}>
+                    <div style={{ fontWeight: 700, color: "#065f46", marginBottom: 6 }}>📊 계산 결과</div>
+                    <div style={{ color: "#065f46", lineHeight: 1.7 }}>
+                      · Severity (규모×범위×회복불가)<sup>1/3</sup> = <strong>{((calcSeverity(r.scale, r.scope, r.irrem)) * 100).toFixed(0)}점</strong><br/>
+                      · 영향 중요도 = Severity × {r.isActual ? "1.0 (실제)" : `${(LIKERT5_MAP[r.likelihood] || 0).toFixed(1)} (잠재)`} = <strong>{(impact * 100).toFixed(0)}점</strong><br/>
+                      · 재무 중요도 = {(LIKERT5_MAP[r.finImpact] || 0).toFixed(1)} × {(LIKERT5_MAP[r.finLikelihood] || 0).toFixed(1)} = <strong>{(financial * 100).toFixed(0)}점</strong>
+                    </div>
+                  </div>
+                )}
+                <div style={{ marginTop: 12, textAlign: "right" }}>
+                  <button onClick={() => {
+                    if (confirm(`${t.title} 평가를 초기화하시겠습니까?`)) {
+                      clearResponse(t.code);
+                      updateResponse(t.code, { applicable: true });
+                    }
+                  }} style={{ fontSize: 11, color: "#dc2626", background: "#fff", border: "1px solid #fca5a5", padding: "4px 10px", borderRadius: 4, cursor: "pointer" }}>🔄 이 주제 재평가</button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ==========================================================================
+// 4단계: 이상치 리포트
+// ==========================================================================
+function AnomalyPage({ responses }) {
+  const anomalies = detectAnomalies(responses);
+  const high = anomalies.filter(a => a.severity === "high");
+  const medium = anomalies.filter(a => a.severity === "medium");
+  const low = anomalies.filter(a => a.severity === "low");
+  return (
+    <div style={{ maxWidth: 900 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>⚠️ 4단계: 이상치 리포트</h3>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#3b82f6", padding: "3px 10px", borderRadius: 4 }}>🔄 실시간 자동생성</span>
+        </div>
+        <p style={{ fontSize: 13, color: "#6b7280" }}>평가 결과에서 재검토가 필요한 부분을 자동으로 식별합니다. 3단계 평가를 수정하면 즉시 반영됩니다.</p>
+      </div>
+      {anomalies.length === 0 ? (
+        <div style={{ background: "#ecfdf5", border: "1px solid #10b981", borderRadius: 8, padding: 24, textAlign: "center" }}>
+          <div style={{ fontSize: 40, marginBottom: 10 }}>✅</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#065f46", marginBottom: 6 }}>이상 신호가 없습니다</div>
+          <div style={{ fontSize: 12, color: "#065f46" }}>평가 결과가 업계 기준과 일관성 있게 작성되었습니다.</div>
+        </div>
+      ) : (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 16 }}>
+            <div style={{ padding: 14, background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 8 }}>
+              <div style={{ fontSize: 11, color: "#991b1b", fontWeight: 700 }}>⛔ 높음 (재검토 필수)</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#991b1b" }}>{high.length}</div>
+            </div>
+            <div style={{ padding: 14, background: "#fffbeb", border: "1px solid #fcd34d", borderRadius: 8 }}>
+              <div style={{ fontSize: 11, color: "#92400e", fontWeight: 700 }}>⚠️ 중간 (검토 권장)</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#92400e" }}>{medium.length}</div>
+            </div>
+            <div style={{ padding: 14, background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8 }}>
+              <div style={{ fontSize: 11, color: "#1e40af", fontWeight: 700 }}>💡 낮음 (참고)</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#1e40af" }}>{low.length}</div>
+            </div>
+          </div>
+          {[
+            { items: high, title: "⛔ 재검토 필수", color: "#991b1b", bg: "#fef2f2", border: "#fca5a5" },
+            { items: medium, title: "⚠️ 검토 권장", color: "#92400e", bg: "#fffbeb", border: "#fcd34d" },
+            { items: low, title: "💡 참고", color: "#1e40af", bg: "#eff6ff", border: "#bfdbfe" },
+          ].map(group => group.items.length > 0 && (
+            <div key={group.title} style={{ marginBottom: 16 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: group.color, marginBottom: 8 }}>{group.title} ({group.items.length})</h4>
+              {group.items.map((a, i) => (
+                <div key={i} style={{ background: group.bg, border: `1px solid ${group.border}`, borderRadius: 6, padding: 12, marginBottom: 6 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: group.color, marginBottom: 4 }}>{a.code} · {a.title}</div>
+                  <div style={{ fontSize: 12, color: group.color, lineHeight: 1.5 }}>{a.msg}</div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ==========================================================================
+// 5단계: 매트릭스
+// ==========================================================================
+function ResultBox({ title, color, bg, items, desc }) {
+  return (
+    <div style={{ background: bg, borderRadius: 8, padding: 14 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color, marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 10, color: "#6b7280", marginBottom: 10 }}>{desc}</div>
+      {items.length === 0 ? (
+        <div style={{ fontSize: 11, color: "#9ca3af", fontStyle: "italic" }}>해당 없음</div>
+      ) : items.map(i => (
+        <div key={i.code} style={{ background: "#fff", padding: "6px 10px", borderRadius: 5, marginBottom: 4, fontSize: 11, display: "flex", justifyContent: "space-between" }}>
+          <span><strong>{i.code}</strong> {i.title}</span>
+          <span style={{ color: "#9ca3af" }}>{(i.maxAxis * 100).toFixed(0)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+function MatrixPage({ responses, meta, updateMeta }) {
+  const threshold = meta.threshold || "top35";
+  const result = calculateMaterialityV2(responses, threshold);
+  if (result.all.length === 0) {
+    return (
+      <div style={{ maxWidth: 700, padding: 40, textAlign: "center" }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", marginBottom: 12 }}>평가 결과가 없습니다</h3>
+        <p style={{ fontSize: 13, color: "#6b7280" }}>먼저 <strong>1·2·3단계</strong>를 완료해주세요.</p>
+      </div>
+    );
+  }
+  return (
+    <div style={{ maxWidth: 980 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>📊 5단계: 결과 매트릭스</h3>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#10b981", padding: "3px 10px", borderRadius: 4 }}>✅ 자동저장됨</span>
+        </div>
+        <p style={{ fontSize: 13, color: "#6b7280" }}>평가된 {result.all.length}개 주제의 영향 × 재무 분포</p>
+      </div>
+      <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8, padding: 16, marginBottom: 16 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#111827", marginBottom: 10 }}>🎯 핵심 이슈 선정 기준 (Threshold)</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+          {[
+            { v: "top35", label: "상위 35%", desc: "평가된 주제 중 상위 35%", badge: "중소기업 권장" },
+            { v: "axis06", label: "한 축 0.6 이상", desc: "영향·재무 중 하나라도 0.6 이상", badge: "GRI 3 권장" },
+            { v: "both05", label: "두 축 0.5 이상", desc: "두 축 모두 0.5 이상 (엄격)", badge: "전통적 방식" },
+          ].map(opt => (
+            <button key={opt.v} onClick={() => updateMeta({ threshold: opt.v })}
+              style={{ padding: 12, fontSize: 12, fontWeight: 600,
+                border: `1.5px solid ${threshold === opt.v ? "#10b981" : "#e5e7eb"}`,
+                background: threshold === opt.v ? "#ecfdf5" : "#fff",
+                color: threshold === opt.v ? "#065f46" : "#6b7280",
+                borderRadius: 6, cursor: "pointer", textAlign: "left" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 2 }}>{opt.label}</div>
+              <div style={{ fontSize: 10, opacity: 0.8, marginBottom: 4 }}>{opt.desc}</div>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#10b981", background: "#ecfdf5", padding: "1px 6px", borderRadius: 3, display: "inline-block" }}>{opt.badge}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8, padding: 20, marginBottom: 20 }}>
+        <MaterialityMatrixV2 result={result} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        <ResultBox title="🎯 핵심 이슈" color="#d97706" bg="#fef3c7" items={result.core} desc="보고서 우선 공시" />
+        <ResultBox title="📋 관리 이슈" color="#2563eb" bg="#dbeafe" items={result.manage} desc="지속 모니터링" />
+        <ResultBox title="👀 참고 이슈" color="#6b7280" bg="#f3f4f6" items={result.monitor} desc="변화 추적" />
+      </div>
+    </div>
+  );
+}
+
+// ==========================================================================
+// 6단계: 확정
+// ==========================================================================
+function ConfirmPage({ responses, data, setBlockData, MAT_KEY, meta }) {
+  const result = calculateMaterialityV2(responses, meta.threshold || "top35");
+  const confirmed = data.confirmed || false;
+  const confirmedAt = data.confirmedAt;
+  const anomalies = detectAnomalies(responses);
+  const highAnomalies = anomalies.filter(a => a.severity === "high").length;
+  const handleConfirm = () => {
+    setBlockData(MAT_KEY, {
+      content_json: {
+        ...data, confirmed: true, confirmedAt: new Date().toISOString(),
+        coreTopics: result.core.map(c => c.code),
+        history: [...(data.history || []), {
+          at: new Date().toISOString(),
+          coreTopics: result.core.map(c => c.code),
+          threshold: meta.threshold,
+        }]
+      },
+      content_text: null,
+    });
+  };
+  const handleReopen = () => {
+    if (confirm("확정을 해제하고 수정 모드로 전환하시겠습니까? 이력은 보존됩니다.")) {
+      setBlockData(MAT_KEY, { content_json: { ...data, confirmed: false }, content_text: null });
+    }
+  };
+  if (result.all.length === 0) {
+    return <div style={{ maxWidth: 700, padding: 40, textAlign: "center" }}><p style={{ fontSize: 13, color: "#6b7280" }}>먼저 평가를 완료해주세요.</p></div>;
+  }
+  return (
+    <div style={{ maxWidth: 900 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>✅ 6단계: 확정</h3>
+          {confirmed
+            ? <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#059669", padding: "3px 10px", borderRadius: 4 }}>🔒 확정 완료</span>
+            : <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e", background: "#fef3c7", padding: "3px 10px", borderRadius: 4, border: "1px solid #fcd34d" }}>확정 대기</span>
+          }
+        </div>
+        <p style={{ fontSize: 13, color: "#6b7280" }}>아래 {result.core.length}개 주제가 보고서 필수 공시 대상으로 확정됩니다. 확정 후에도 "재오픈"으로 수정 가능 (이력 보존).</p>
+      </div>
+      {highAnomalies > 0 && (
+        <div style={{ background: "#fef2f2", border: "2px solid #fca5a5", borderRadius: 8, padding: 14, marginBottom: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#991b1b", marginBottom: 4 }}>⛔ 재검토 필수 이슈 {highAnomalies}건</div>
+          <div style={{ fontSize: 12, color: "#991b1b", lineHeight: 1.6 }}>확정 전 4단계 이상치 리포트를 확인하시기 바랍니다.</div>
+        </div>
+      )}
+      <div style={{ background: "#fff", border: "2px solid #d97706", borderRadius: 8, padding: 18, marginBottom: 16 }}>
+        <h4 style={{ fontSize: 15, fontWeight: 700, color: "#92400e", marginBottom: 12 }}>🎯 확정 대상 핵심 이슈</h4>
+        {result.core.map(c => (
+          <div key={c.code} style={{ padding: "10px 12px", background: "#fef3c7", borderRadius: 5, marginBottom: 6 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <strong>{c.code}</strong> · {c.title}
+                <div style={{ fontSize: 10, color: "#92400e", marginTop: 2 }}>GRI: {c.gri.join(" · ")} &nbsp;|&nbsp; K-ESG: {c.kesg.join(" · ")}</div>
+              </div>
+              <div style={{ fontSize: 11, color: "#92400e" }}>영향 {(c.impact*100).toFixed(0)} / 재무 {(c.financial*100).toFixed(0)}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      {confirmed ? (
+        <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ flex: 1, background: "#d1fae5", border: "1px solid #10b981", borderRadius: 8, padding: 14, fontSize: 13, color: "#065f46" }}>
+            ✓ <strong>확정 완료</strong> · {confirmedAt ? new Date(confirmedAt).toLocaleDateString("ko-KR") : ''} · 보고서 공시에 자동 반영됩니다.
+          </div>
+          <button onClick={handleReopen} style={{ padding: "12px 20px", fontSize: 13, fontWeight: 600, background: "#fff", color: "#dc2626", border: "1.5px solid #fca5a5", borderRadius: 8, cursor: "pointer" }}>🔄 수정 모드 전환</button>
+        </div>
+      ) : (
+        <button onClick={handleConfirm} style={{ width: "100%", padding: "12px 20px", fontSize: 14, fontWeight: 700, background: "#d97706", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer" }}>✓ 핵심 주제 확정하기</button>
+      )}
+      {data.history && data.history.length > 0 && (
+        <div style={{ marginTop: 20, background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8, padding: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", marginBottom: 8 }}>📅 확정 이력</div>
+          {data.history.slice().reverse().map((h, i) => (
+            <div key={i} style={{ fontSize: 11, color: "#9ca3af", padding: "4px 0", borderTop: i > 0 ? "1px solid #f3f4f6" : "none" }}>
+              {new Date(h.at).toLocaleString("ko-KR")} · 핵심 이슈 {h.coreTopics?.length || 0}개 · 기준: {h.threshold}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ==========================================================================
+// 7단계: 보고서 생성
+// ==========================================================================
+function ReportPage({ responses, data, setBlockData, MAT_KEY, meta, updateMeta }) {
+  const result = calculateMaterialityV2(responses, meta.threshold || "top35");
+  const paragraphs = generateReportParagraphsV2(result, meta);
+  const stakeholderNotes = meta.stakeholderNotes || "";
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => alert("복사되었습니다."));
+  };
+  const printReport = () => window.print();
+  if (result.all.length === 0) {
+    return <div style={{ maxWidth: 700, padding: 40, textAlign: "center" }}><p style={{ fontSize: 13, color: "#6b7280" }}>먼저 평가를 완료해주세요.</p></div>;
+  }
+  const stakeholderSection = stakeholderNotes ? `\n\n[이해관계자 의견 반영]\n${stakeholderNotes}` : "";
+  const vcSection = paragraphs.valueChainText ? `\n\n[가치사슬 매핑]\n${paragraphs.valueChainText}` : "";
+  const fullText = `\n[이중중대성평가]\n\n${paragraphs.methodology}\n${vcSection}\n\n${paragraphs.coreText}\n\n${paragraphs.coreDetails}\n\n${paragraphs.manageText}${stakeholderSection}\n  `.trim();
+  return (
+    <div style={{ maxWidth: 900 }}>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>📝 7단계: 보고서 생성</h3>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#3b82f6", padding: "3px 10px", borderRadius: 4 }}>🔄 실시간 자동생성</span>
+        </div>
+        <p style={{ fontSize: 13, color: "#6b7280" }}>지속가능경영 보고서의 중요성평가 섹션 초안입니다.</p>
+      </div>
+      <div style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 8, padding: 16, marginBottom: 16 }}>
+        <h4 style={{ fontSize: 13, fontWeight: 700, color: "#1e40af", marginBottom: 6 }}>💬 이해관계자 의견 (GRI 3-1-c 요건)</h4>
+        <p style={{ fontSize: 11, color: "#1e40af", marginBottom: 10, lineHeight: 1.5 }}>
+          이해관계자(고객·협력사·임직원·지역사회 등)의 의견을 어떻게 수렴·반영했는지 기록하면 보고서에 자동 포함됩니다.
+        </p>
+        <textarea value={stakeholderNotes} onChange={e => updateMeta({ stakeholderNotes: e.target.value })}
+          placeholder="예: 주요 고객사 ESG 평가 설문(연 1회), 협력사 대표자 간담회(연 2회), 임직원 ESG 인식 조사(2024) 결과를 반영하였습니다."
+          style={{ width: "100%", minHeight: 80, padding: 10, fontSize: 12, border: "1px solid #bfdbfe", borderRadius: 5, resize: "vertical", fontFamily: "inherit" }}
+        />
+      </div>
+      <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8, padding: 20, marginBottom: 16 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <h4 style={{ fontSize: 14, fontWeight: 700, color: "#111827", margin: 0 }}>📄 자동 생성 문단</h4>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={printReport} style={{ padding: "6px 12px", fontSize: 11, fontWeight: 600, background: "#6b7280", color: "#fff", border: "none", borderRadius: 5, cursor: "pointer" }}>🖨 PDF로 저장</button>
+            <button onClick={() => copyToClipboard(fullText)} style={{ padding: "6px 12px", fontSize: 11, fontWeight: 600, background: "#10b981", color: "#fff", border: "none", borderRadius: 5, cursor: "pointer" }}>📋 전체 복사</button>
+          </div>
+        </div>
+        <div style={{ fontSize: 13, lineHeight: 1.7, color: "#374151" }}>
+          <div style={{ fontWeight: 700, marginBottom: 8, color: "#111827" }}>■ 방법론</div>
+          <p style={{ margin: "0 0 16px 0", whiteSpace: "pre-wrap" }}>{paragraphs.methodology}</p>
+          {paragraphs.valueChainText && (
+            <>
+              <div style={{ fontWeight: 700, marginBottom: 8, color: "#111827" }}>■ 가치사슬 매핑</div>
+              <p style={{ margin: "0 0 16px 0", whiteSpace: "pre-wrap" }}>{paragraphs.valueChainText}</p>
+            </>
+          )}
+          <div style={{ fontWeight: 700, marginBottom: 8, color: "#111827" }}>■ 핵심 이슈 도출 결과</div>
+          <p style={{ margin: "0 0 16px 0", whiteSpace: "pre-wrap" }}>{paragraphs.coreText}</p>
+          <div style={{ fontWeight: 700, marginBottom: 8, color: "#111827" }}>■ 핵심 이슈별 상세</div>
+          <pre style={{ margin: "0 0 16px 0", whiteSpace: "pre-wrap", fontFamily: "inherit", fontSize: 12, background: "#f9fafb", padding: 12, borderRadius: 5 }}>{paragraphs.coreDetails}</pre>
+          {paragraphs.manageText && (
+            <>
+              <div style={{ fontWeight: 700, marginBottom: 8, color: "#111827" }}>■ 관리 이슈</div>
+              <p style={{ margin: "0 0 16px 0", whiteSpace: "pre-wrap" }}>{paragraphs.manageText}</p>
+            </>
+          )}
+          {stakeholderNotes && (
+            <>
+              <div style={{ fontWeight: 700, marginBottom: 8, color: "#111827" }}>■ 이해관계자 의견 반영</div>
+              <p style={{ margin: "0", whiteSpace: "pre-wrap" }}>{stakeholderNotes}</p>
+            </>
+          )}
+        </div>
+      </div>
+      <div style={{ background: "#eff6ff", border: "1px solid #3b82f6", borderRadius: 8, padding: 14, fontSize: 12, color: "#1e40af" }}>
+        💡 이 문단은 <strong>GRI 3 Material Topics 2021 공시 요건</strong>을 충족하는 골격입니다. 회사 맥락을 추가로 반영하시기 바랍니다.
+      </div>
+    </div>
   );
 }
 
