@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v0.6</title>
+<title>The 4th Edge · ESG 플랫폼 v0.7</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -279,7 +279,7 @@
   }
   @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-  /* ===== v0.5: 입력폼 · v0.6: 이중중요성평가 추가 ===== */
+  /* ===== v0.5: 입력폼 · v0.7: 이중중요성평가 추가 ===== */
   .edit-toolbar {
     display: flex; gap: 20px; align-items: center;
     margin-bottom: 24px; padding: 14px 16px;
@@ -420,7 +420,7 @@
   .empty-note {
     color: #6b8290; font-size: 13px; padding: 8px 0;
   }
-  /* ===== v0.6: 이중중요성평가 라이트 테마 ===== */
+  /* ===== v0.7: 이중중요성평가 라이트 테마 ===== */
   .main-light {
     background: #f9fafb !important;
     color: #111827;
@@ -558,7 +558,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v0.6 · 이중중요성평가</div>
+        <div className="muted">v0.7 · 실시간 대시보드</div>
       </div>
     </div>
   );
@@ -645,6 +645,13 @@ function Sidebar({ profile, company, categories, selectedId, onSelect, onChangeC
       </div>
 
       <nav className="sb-nav">
+        <button
+          className={"sb-item" + (!selectedId ? " active" : "")}
+          onClick={() => onSelect(null)}
+          style={{ marginBottom: 8, fontWeight: 600 }}
+        >
+          🏠 실시간 대시보드
+        </button>
         {visibleGroups.map(g => {
           const items = grouped[g.key] || [];
           if (items.length === 0) return null;
@@ -691,37 +698,302 @@ function Sidebar({ profile, company, categories, selectedId, onSelect, onChangeC
 }
 
 // ==================== 메인 영역 ====================
-function WelcomePane({ company, categoriesCount }) {
+function WelcomePane({ company, categoriesCount, supabase, profile }) {
+  const [inputs, setInputs] = useState([]);
+  const [fields, setFields] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [matSession, setMatSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      setLoading(true);
+      const [ir, fr, cr, mr] = await Promise.all([
+        supabase.from("data_inputs")
+          .select("field_id, year, value_number, value_text, value_json, updated_at")
+          .eq("company_id", company.id),
+        supabase.from("data_fields")
+          .select("id, field_code, label, unit, gri_disclosures, menu_category_id"),
+        supabase.from("menu_categories").select("*"),
+        supabase.from("materiality_sessions")
+          .select("session_data, confirmed, confirmed_at, updated_at")
+          .eq("company_id", company.id)
+          .maybeSingle(),
+      ]);
+      if (!alive) return;
+      setInputs(ir.data || []);
+      setFields(fr.data || []);
+      setCategories(cr.data || []);
+      setMatSession(mr.data || null);
+      setLoading(false);
+    })();
+    return () => { alive = false; };
+  }, [company.id, supabase]);
+
+  // ===== Scope 1·2·3 연도별 합계 =====
+  const scopeByYear = useMemo(() => {
+    const by = { 2023: { s1: 0, s2: 0, s3: 0 }, 2024: { s1: 0, s2: 0, s3: 0 }, 2025: { s1: 0, s2: 0, s3: 0 } };
+    const fieldMap = {};
+    fields.forEach(f => { fieldMap[f.id] = f; });
+    inputs.forEach(inp => {
+      const f = fieldMap[inp.field_id];
+      if (!f || inp.value_number === null || inp.value_number === undefined) return;
+      const v = parseFloat(inp.value_number);
+      if (!by[inp.year] || !v) return;
+      const griList = Array.isArray(f.gri_disclosures) ? f.gri_disclosures : [];
+      const hit = (code) => griList.some(d => typeof d === "string" && d.includes(code));
+      if (hit("305-1")) by[inp.year].s1 += v;
+      else if (hit("305-2")) by[inp.year].s2 += v;
+      else if (hit("305-3")) by[inp.year].s3 += v;
+    });
+    return by;
+  }, [inputs, fields]);
+
+  // ===== 전체 진행률 + 카테고리별 진행률 =====
+  const stats = useMemo(() => {
+    const totalFields = fields.length;
+    const filledFieldIds = new Set();
+    inputs.forEach(inp => {
+      const hasVal = (inp.value_number !== null && inp.value_number !== undefined)
+                  || (inp.value_text !== null && inp.value_text !== undefined && inp.value_text !== "")
+                  || (inp.value_json !== null && inp.value_json !== undefined);
+      if (hasVal) filledFieldIds.add(inp.field_id);
+    });
+    const filled = filledFieldIds.size;
+    const overallPct = totalFields > 0 ? (filled / totalFields * 100) : 0;
+
+    const fieldsByCat = {};
+    fields.forEach(f => {
+      if (!fieldsByCat[f.menu_category_id]) fieldsByCat[f.menu_category_id] = [];
+      fieldsByCat[f.menu_category_id].push(f.id);
+    });
+    const filledByCat = {};
+    inputs.forEach(inp => {
+      const f = fields.find(ff => ff.id === inp.field_id);
+      if (!f) return;
+      const hasVal = (inp.value_number !== null && inp.value_number !== undefined)
+                  || (inp.value_text !== null && inp.value_text !== undefined && inp.value_text !== "")
+                  || (inp.value_json !== null && inp.value_json !== undefined);
+      if (!hasVal) return;
+      if (!filledByCat[f.menu_category_id]) filledByCat[f.menu_category_id] = new Set();
+      filledByCat[f.menu_category_id].add(inp.field_id);
+    });
+    const catProgress = categories.map(c => {
+      const total = (fieldsByCat[c.id] || []).length;
+      const fld = (filledByCat[c.id] || new Set()).size;
+      return { id: c.id, name: c.name, code: c.code, group: c.group, total, filled: fld, pct: total > 0 ? (fld / total * 100) : 0 };
+    }).filter(c => c.total > 0).sort((a, b) => b.pct - a.pct);
+
+    return { totalFields, filled, overallPct, catProgress };
+  }, [inputs, fields, categories]);
+
+  // 마지막 입력 시각
+  const lastInputAt = useMemo(() => {
+    if (inputs.length === 0) return null;
+    return inputs.reduce((latest, i) => !i.updated_at || (latest && latest > i.updated_at) ? latest : i.updated_at, null);
+  }, [inputs]);
+
+  // 이중중대성 요약
+  const matSummary = useMemo(() => {
+    if (!matSession) return { confirmed: false, coreCount: 0, assessedCount: 0 };
+    const sd = matSession.session_data || {};
+    const responses = sd.responses || {};
+    const coreTopics = sd.coreTopics || [];
+    const assessed = Object.values(responses).filter(r =>
+      r && r.applicable === true && r.scale > 0 && r.scope > 0 && r.irrem > 0 && r.finImpact > 0 && r.finLikelihood > 0
+    ).length;
+    return { confirmed: !!matSession.confirmed, coreCount: coreTopics.length, assessedCount: assessed };
+  }, [matSession]);
+
+  // ===== 3년 추세 SVG =====
+  const renderScopeTrendSVG = () => {
+    const years = [2023, 2024, 2025];
+    const COL = { s1: "#ef4444", s2: "#f59e0b", s3: "#8b5cf6" };
+    const allVals = years.flatMap(y => [scopeByYear[y].s1, scopeByYear[y].s2, scopeByYear[y].s3]);
+    const maxVal = Math.max(...allVals, 1);
+    const niceMax = Math.ceil(maxVal * 1.15 / 10) * 10 || 10;
+    const W = 720, H = 280;
+    const M = { top: 20, right: 30, bottom: 60, left: 60 };
+    const PW = W - M.left - M.right;
+    const PH = H - M.top - M.bottom;
+    const groupW = PW / 3;
+    const barW = 34, barGap = 6;
+    const hasData = allVals.some(v => v > 0);
+
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", maxHeight: 340, display: "block" }}>
+        {/* Y축 그리드 */}
+        {Array.from({ length: 6 }).map((_, i) => {
+          const y = M.top + (PH / 5) * i;
+          const val = niceMax * (1 - i / 5);
+          return (
+            <g key={`grid-${i}`}>
+              <line x1={M.left} y1={y} x2={M.left + PW} y2={y} stroke="rgba(255,255,255,0.08)" strokeDasharray="2 4" />
+              <text x={M.left - 8} y={y + 4} textAnchor="end" fontSize="10" fill="rgba(255,255,255,0.5)">{val.toFixed(0)}</text>
+            </g>
+          );
+        })}
+        <line x1={M.left} y1={M.top + PH} x2={M.left + PW} y2={M.top + PH} stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+        <text x={M.left - 44} y={M.top + PH / 2} fontSize="10" fill="rgba(255,255,255,0.5)"
+          transform={`rotate(-90, ${M.left - 44}, ${M.top + PH / 2})`} textAnchor="middle">tCO₂eq</text>
+
+        {/* 그룹 막대 */}
+        {years.map((year, i) => {
+          const gx = M.left + groupW * i + groupW / 2;
+          const items = [
+            { v: scopeByYear[year].s1, c: COL.s1, lbl: "Scope 1" },
+            { v: scopeByYear[year].s2, c: COL.s2, lbl: "Scope 2" },
+            { v: scopeByYear[year].s3, c: COL.s3, lbl: "Scope 3" },
+          ];
+          const total = items.length * barW + (items.length - 1) * barGap;
+          const sx = gx - total / 2;
+          return (
+            <g key={`y-${year}`}>
+              {items.map((it, j) => {
+                const h = it.v > 0 ? (it.v / niceMax) * PH : 0;
+                const bx = sx + j * (barW + barGap);
+                const by = M.top + PH - h;
+                return (
+                  <g key={j}>
+                    <rect x={bx} y={by} width={barW} height={h} fill={it.c} rx="3">
+                      <title>{it.lbl} ({year}): {it.v.toFixed(2)} tCO₂eq</title>
+                    </rect>
+                    {it.v > 0.1 && h > 18 && (
+                      <text x={bx + barW / 2} y={by - 4} textAnchor="middle" fontSize="10" fontWeight="700" fill={it.c}>
+                        {it.v.toFixed(1)}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+              <text x={gx} y={M.top + PH + 20} textAnchor="middle" fontSize="12" fontWeight="600" fill="rgba(255,255,255,0.85)">{year}년</text>
+            </g>
+          );
+        })}
+
+        {/* 범례 */}
+        <g transform={`translate(${M.left + 10}, ${H - 18})`}>
+          {[
+            { lbl: "Scope 1 (직접)", c: COL.s1 },
+            { lbl: "Scope 2 (전력)", c: COL.s2 },
+            { lbl: "Scope 3 (공급망)", c: COL.s3 },
+          ].map((it, i) => (
+            <g key={i} transform={`translate(${i * 140}, 0)`}>
+              <rect width="11" height="11" rx="2" fill={it.c} />
+              <text x="16" y="10" fontSize="11" fill="rgba(255,255,255,0.85)">{it.lbl}</text>
+            </g>
+          ))}
+        </g>
+
+        {!hasData && (
+          <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="14" fill="rgba(255,255,255,0.4)">
+            GRI 305-1·305-2·305-3 연계 필드 입력 시 자동 표시됩니다
+          </text>
+        )}
+      </svg>
+    );
+  };
+
+  if (loading) {
+    return (
+      <>
+        <div className="main-header"><div>
+          <div className="main-title">{company.name} · 대시보드</div>
+          <div className="main-subtitle">데이터 불러오는 중...</div>
+        </div></div>
+      </>
+    );
+  }
+
   return (
     <>
       <div className="main-header">
         <div>
-          <div className="main-title">{company.name} · ESG 데이터 대시보드</div>
-          <div className="main-subtitle">좌측 사이드바에서 카테고리를 선택하세요</div>
+          <div className="main-title">{company.name} · ESG 실시간 대시보드</div>
+          <div className="main-subtitle">
+            {lastInputAt
+              ? `마지막 입력: ${new Date(lastInputAt).toLocaleString("ko-KR", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`
+              : "좌측 사이드바에서 카테고리를 선택해 데이터 입력을 시작하세요"}
+          </div>
         </div>
       </div>
 
+      {/* KPI 4개 */}
       <div className="stats-grid">
-        <div className="stat"><div className="n">{categoriesCount}</div><div className="l">카테고리</div></div>
-        <div className="stat"><div className="n">578</div><div className="l">입력 필드</div></div>
-        <div className="stat"><div className="n">140</div><div className="l">GRI 공시</div></div>
-        <div className="stat"><div className="n">0</div><div className="l">입력 진행률</div></div>
+        <div className="stat">
+          <div className="n">{stats.filled}<span style={{ fontSize: 18, color: "rgba(255,255,255,0.5)" }}> / {stats.totalFields}</span></div>
+          <div className="l">입력 완료 필드</div>
+        </div>
+        <div className="stat">
+          <div className="n" style={{ color: stats.overallPct >= 80 ? "#10b981" : stats.overallPct >= 40 ? "#f59e0b" : "#fff" }}>
+            {stats.overallPct.toFixed(1)}<span style={{ fontSize: 18 }}>%</span>
+          </div>
+          <div className="l">전체 입력 진행률</div>
+        </div>
+        <div className="stat">
+          <div className="n">{matSummary.assessedCount}<span style={{ fontSize: 18, color: "rgba(255,255,255,0.5)" }}> / 15</span></div>
+          <div className="l">이중중대성 평가</div>
+        </div>
+        <div className="stat">
+          <div className="n" style={{ color: matSummary.confirmed ? "#10b981" : "#fff" }}>
+            {matSummary.confirmed ? `🔒 ${matSummary.coreCount}` : "—"}
+          </div>
+          <div className="l">{matSummary.confirmed ? "핵심 이슈 확정" : "아직 미확정"}</div>
+        </div>
       </div>
 
-      <div className="welcome-grid">
-        <div className="welcome-card">
-          <h3>🌱 환경 · 사회 · 거버넌스 데이터 입력</h3>
-          <p>사업장·연도별로 578개 ESG 지표를 체계적으로 관리합니다. GRI 2025 신규표준 101·102·103 완전 준거.</p>
+      {/* Scope 1·2·3 3년 추세 그래프 */}
+      <div className="welcome-card" style={{ marginTop: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+          <h3 style={{ margin: 0 }}>📈 Scope 1·2·3 온실가스 배출량 3년 추세</h3>
+          {(() => {
+            const t2024 = scopeByYear[2024].s1 + scopeByYear[2024].s2 + scopeByYear[2024].s3;
+            const t2025 = scopeByYear[2025].s1 + scopeByYear[2025].s2 + scopeByYear[2025].s3;
+            if (t2024 <= 0 || t2025 <= 0) return null;
+            const pct = (t2025 - t2024) / t2024 * 100;
+            return (
+              <span style={{
+                fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 4,
+                background: pct < 0 ? "rgba(16,185,129,0.2)" : "rgba(239,68,68,0.2)",
+                color: pct < 0 ? "#10b981" : "#ef4444",
+              }}>
+                2024 → 2025 전년 대비 {pct < 0 ? "▼" : "▲"} {Math.abs(pct).toFixed(1)}%
+              </span>
+            );
+          })()}
         </div>
-        <div className="welcome-card">
-          <h3>🎯 이중중요성평가 v2</h3>
-          <p>ESRS IG1 기반 Scale × Scope × Irrem × Likelihood 평가. 외부 벤치마크 검증 루프까지 내장.</p>
-        </div>
-        <div className="welcome-card">
-          <h3>📊 자동 출력물 생성</h3>
-          <p>GRI Content Index Excel · 검증 대응 ZIP · 전문가 핸드오프 패키지를 한 번의 클릭으로.</p>
-        </div>
+        <p style={{ fontSize: 12, marginBottom: 14, color: "rgba(255,255,255,0.55)" }}>
+          GRI 305-1·305-2·305-3 연계 필드의 연도별 합계 · 단위: tCO₂eq
+        </p>
+        {renderScopeTrendSVG()}
       </div>
+
+      {/* 카테고리별 진행률 */}
+      {stats.catProgress.length > 0 && (
+        <div className="welcome-card" style={{ marginTop: 16 }}>
+          <h3 style={{ margin: "0 0 4px 0" }}>📊 카테고리별 입력 진행률</h3>
+          <p style={{ fontSize: 12, marginBottom: 14, color: "rgba(255,255,255,0.55)" }}>
+            {stats.catProgress.length}개 카테고리 · 담당 부서 진행 상황
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {stats.catProgress.map(c => {
+              const color = c.pct >= 80 ? "#10b981" : c.pct >= 40 ? "#f59e0b" : c.pct > 0 ? "#3b82f6" : "#6b7280";
+              return (
+                <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ flex: "0 0 200px", fontSize: 13, color: "rgba(255,255,255,0.85)" }}>{c.name}</div>
+                  <div style={{ flex: 1, height: 8, background: "rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
+                    <div style={{ width: `${c.pct}%`, height: "100%", background: color, transition: "width 0.4s" }} />
+                  </div>
+                  <div style={{ flex: "0 0 110px", textAlign: "right", fontSize: 12, color: "rgba(255,255,255,0.7)", fontFeatureSettings: "'tnum'" }}>
+                    {c.filled} / {c.total} · <strong style={{ color }}>{c.pct.toFixed(0)}%</strong>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -1154,7 +1426,7 @@ function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout 
     return () => { alive = false; };
   }, [supabase, company.id]);
 
-  // v0.6: 이중중요성평가 카테고리 판별
+  // v0.7: 이중중요성평가 카테고리 판별
   const isMateriality = selected && (
     selected.code === 'materiality_v2' ||
     selected.code === 'materiality' ||
@@ -1178,7 +1450,7 @@ function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout 
           ? (isMateriality
               ? <MaterialityPanel category={selected} company={company} supabase={supabase} profile={profile} />
               : <CategoryPane category={selected} company={company} supabase={supabase} profile={profile} />)
-          : <WelcomePane company={company} categoriesCount={categories.length} />}
+          : <WelcomePane company={company} categoriesCount={categories.length} supabase={supabase} profile={profile} />}
       </main>
     </div>
   );
@@ -1307,7 +1579,7 @@ function App() {
 }
 
 // ==========================================================================
-// v0.6 이중중요성평가 모듈
+// v0.7 이중중요성평가 모듈
 // GRI 3 Material Topics 2021 · ESRS 1 · VSME · K-ESG 준수
 // ==========================================================================
 
@@ -1601,7 +1873,7 @@ function MaterialityMatrixV2({ result, width = 640, height = 480 }) {
 }
 
 // ==========================================================================
-// MaterialityPanel (v0.6) - Supabase materiality_sessions에 자동 저장
+// MaterialityPanel (v0.7) - Supabase materiality_sessions에 자동 저장
 // ==========================================================================
 const MAT_KEY = "materiality_v2";
 const MAT_SUBS = [
