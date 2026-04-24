@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v0.8</title>
+<title>The 4th Edge · ESG 플랫폼 v0.9</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
@@ -279,7 +280,7 @@
   }
   @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-  /* ===== v0.5: 입력폼 · v0.8: 이중중요성평가 추가 ===== */
+  /* ===== v0.5: 입력폼 · v0.9: 이중중요성평가 추가 ===== */
   .edit-toolbar {
     display: flex; gap: 20px; align-items: center;
     margin-bottom: 24px; padding: 14px 16px;
@@ -420,7 +421,7 @@
   .empty-note {
     color: #6b8290; font-size: 13px; padding: 8px 0;
   }
-  /* ===== v0.8: 이중중요성평가 라이트 테마 ===== */
+  /* ===== v0.9: 이중중요성평가 라이트 테마 ===== */
   .main-light {
     background: #f9fafb !important;
     color: #111827;
@@ -467,7 +468,375 @@
   }
   .mat-saving.saving { color: #d97706; border-color: #fcd34d; background: #fffbeb; }
   .mat-saving.saved { color: #059669; border-color: #a7f3d0; background: #ecfdf5; }
-  /* ===== v0.8: 카테고리 자동 METRICS 표 ===== */
+  /* ===== v0.9: 카드형 위자드 ===== */
+  .mode-toggle {
+    display: inline-flex;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+    margin-right: 12px;
+  }
+  .mode-toggle button {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mode-toggle button.active {
+    background: rgba(136,204,255,0.2);
+    color: #88ccff;
+  }
+  .excel-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: #34d399;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .excel-upload:hover { background: rgba(16,185,129,0.25); }
+  .excel-upload input { display: none; }
+
+  .card-wizard {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 0;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .card-wizard-progress {
+    padding: 18px 28px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .card-wizard-progress-text {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    white-space: nowrap;
+    font-feature-settings: 'tnum';
+  }
+  .card-wizard-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .card-wizard-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #88ccff 0%, #10b981 100%);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+  .card-wizard-body {
+    padding: 36px 40px 28px;
+    min-height: 380px;
+  }
+  .card-wizard-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .card-wizard-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .help-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(136,204,255,0.15);
+    border: 1px solid rgba(136,204,255,0.3);
+    color: #88ccff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: help;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-top: 4px;
+  }
+  .help-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    z-index: 100;
+    width: 320px;
+    background: rgba(15,32,39,0.98);
+    border: 1px solid rgba(136,204,255,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.9);
+    line-height: 1.6;
+    text-align: left;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    font-weight: 400;
+  }
+  .help-tooltip-title {
+    font-weight: 700;
+    color: #88ccff;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .card-context {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    font-size: 11px;
+  }
+  .card-context-pill {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.7);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .card-gri-pill {
+    background: rgba(16,185,129,0.12);
+    color: #34d399;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .quick-picks {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  .quick-picks-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: rgba(136,204,255,0.9);
+    font-weight: 600;
+  }
+  .quick-picks-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pick-chip {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+    font-weight: 500;
+  }
+  .pick-chip:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(136,204,255,0.3);
+  }
+  .pick-chip.active {
+    background: rgba(136,204,255,0.15);
+    border-color: #88ccff;
+    color: #fff;
+  }
+  .pick-chip.active::before {
+    content: '✓';
+    color: #88ccff;
+    font-weight: 700;
+  }
+  .rec-badge {
+    background: #f59e0b;
+    color: #1a1a1a;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+  .card-text-input {
+    width: 100%;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+    line-height: 1.6;
+    min-height: 100px;
+    resize: vertical;
+  }
+  .card-text-input:focus {
+    outline: none;
+    border-color: rgba(136,204,255,0.5);
+  }
+  .card-wizard-nav {
+    padding: 20px 28px;
+    background: rgba(255,255,255,0.03);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .card-wizard-nav button {
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+  .card-wizard-nav .btn-prev {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.8);
+    border-color: rgba(255,255,255,0.08);
+  }
+  .card-wizard-nav .btn-prev:hover { background: rgba(255,255,255,0.1); }
+  .card-wizard-nav .btn-prev:disabled { opacity: 0.3; cursor: not-allowed; }
+  .card-wizard-nav .btn-skip {
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+  }
+  .card-wizard-nav .btn-skip:hover { color: rgba(255,255,255,0.8); }
+  .card-wizard-nav .btn-next {
+    background: #10b981;
+    color: #fff;
+    margin-left: auto;
+  }
+  .card-wizard-nav .btn-next:hover { background: #059669; }
+  .card-wizard-complete {
+    text-align: center;
+    padding: 60px 40px;
+  }
+  .card-wizard-complete h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .card-wizard-complete p {
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 24px;
+  }
+  .card-wizard-complete button {
+    background: #88ccff;
+    color: #0f2027;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* 숫자/불린/셀렉트용 카드 입력 */
+  .card-number-input {
+    width: 100%;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+    font-family: inherit;
+    text-align: right;
+    font-feature-settings: 'tnum';
+  }
+  .card-number-input:focus {
+    outline: none;
+    border-color: rgba(136,204,255,0.5);
+  }
+  .card-number-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card-number-unit {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .card-boolean-group {
+    display: flex;
+    gap: 10px;
+  }
+  .card-boolean-btn {
+    flex: 1;
+    padding: 18px;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: rgba(255,255,255,0.8);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .card-boolean-btn:hover { background: rgba(255,255,255,0.08); }
+  .card-boolean-btn.active.yes {
+    background: rgba(16,185,129,0.15);
+    border-color: #10b981;
+    color: #34d399;
+  }
+  .card-boolean-btn.active.no {
+    background: rgba(239,68,68,0.15);
+    border-color: #ef4444;
+    color: #fca5a5;
+  }
+  .card-select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-select-option {
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .card-select-option:hover { background: rgba(255,255,255,0.08); }
+  .card-select-option.active {
+    background: rgba(136,204,255,0.15);
+    border-color: #88ccff;
+    color: #fff;
+    font-weight: 600;
+  }
   .auto-summary-block {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
@@ -696,7 +1065,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v0.8 · 실시간 대시보드</div>
+        <div className="muted">v0.9 · 실시간 대시보드</div>
       </div>
     </div>
   );
@@ -1445,6 +1814,37 @@ function CategoryEditPane({ category, company, supabase, profile }) {
   const hasAnyBySite = fields.some(f => f.is_by_site);
   const hasAnyByYear = fields.some(f => f.is_by_year);
 
+  // v0.9: 카드형(wizard) / 리스트(list) 모드 토글
+  const [viewMode, setViewMode] = useState(() => {
+    try { return localStorage.getItem("t4e_view_mode") || "card"; } catch { return "card"; }
+  });
+  function changeViewMode(m) {
+    setViewMode(m);
+    try { localStorage.setItem("t4e_view_mode", m); } catch {}
+  }
+
+  // v0.9: 엑셀 업로드 처리
+  function handleExcelUpload(updates, notFound) {
+    if (updates.length === 0) {
+      alert(`❌ 매칭되는 필드 없음.\n\n못 찾은 항목: ${notFound.slice(0, 5).join(", ")}${notFound.length > 5 ? " 외 " + (notFound.length - 5) + "개" : ""}\n\n엑셀의 "field_code" 또는 "label" 컬럼이 플랫폼 필드명과 일치해야 합니다.`);
+      return;
+    }
+    // values 상태에 반영
+    const newValues = { ...values };
+    updates.forEach(u => {
+      const siteId = u.field.is_by_site ? (u.siteId || currentSite?.id || null) : null;
+      const year = u.field.is_by_year ? (u.year || currentYear) : 0;
+      // 컨텍스트가 현재 화면과 같은 것만 values에 반영 (다른 건 직접 DB 저장)
+      const targetSiteId = u.field.is_by_site ? (currentSite?.id || null) : null;
+      const targetYear = u.field.is_by_year ? currentYear : 0;
+      if (siteId === targetSiteId && year === targetYear) {
+        newValues[u.field.id] = u.value;
+      }
+    });
+    setValues(newValues);
+    alert(`✓ ${updates.length}개 필드에 값이 로드되었습니다.\n\n${notFound.length > 0 ? "매칭 실패: " + notFound.length + "개\n" : ""}저장 버튼을 눌러 DB에 반영하세요.`);
+  }
+
   return (
     <>
       <div className="main-header">
@@ -1487,7 +1887,16 @@ function CategoryEditPane({ category, company, supabase, profile }) {
             </div>
           </div>
         )}
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <div className="mode-toggle">
+            <button className={viewMode === "card" ? "active" : ""} onClick={() => changeViewMode("card")}>
+              🃏 카드형
+            </button>
+            <button className={viewMode === "list" ? "active" : ""} onClick={() => changeViewMode("list")}>
+              📋 리스트
+            </button>
+          </div>
+          <ExcelUploadButton fields={fields} sites={sites} onUpload={handleExcelUpload} />
           {dirtyCount > 0 && <span className="save-status dirty">미저장 {dirtyCount}개</span>}
           {dirtyCount === 0 && savedAt && <span className="save-status">✓ 저장됨</span>}
           <button className="save-btn" onClick={handleSave} disabled={saving || dirtyCount === 0}>
@@ -1519,16 +1928,30 @@ function CategoryEditPane({ category, company, supabase, profile }) {
             categoryName={category.name}
             categoryCode={category.code}
           />
-          <div className="field-list">
-            {fields.map(f => (
-              <FieldRow key={f.id}
-                field={f}
-                value={getValue(f)}
-                onChange={v => setFieldValue(f, v)}
-                currentSite={currentSite}
-                currentYear={currentYear} />
-            ))}
-          </div>
+          {viewMode === "card" ? (
+            <CategoryCardWizard
+              fields={fields}
+              currentSite={currentSite}
+              currentYear={currentYear}
+              getValue={getValue}
+              setFieldValue={setFieldValue}
+              onSave={handleSave}
+              saving={saving}
+              dirtyCount={dirtyCount}
+              sites={sites}
+            />
+          ) : (
+            <div className="field-list">
+              {fields.map(f => (
+                <FieldRow key={f.id}
+                  field={f}
+                  value={getValue(f)}
+                  onChange={v => setFieldValue(f, v)}
+                  currentSite={currentSite}
+                  currentYear={currentYear} />
+              ))}
+            </div>
+          )}
         </>
       )}
     </>
@@ -1573,7 +1996,7 @@ function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout 
     return () => { alive = false; };
   }, [supabase, company.id]);
 
-  // v0.8: 이중중요성평가 카테고리 판별
+  // v0.9: 이중중요성평가 카테고리 판별
   const isMateriality = selected && (
     selected.code === 'materiality_v2' ||
     selected.code === 'materiality' ||
@@ -1726,7 +2149,7 @@ function App() {
 }
 
 // ==========================================================================
-// v0.8 이중중요성평가 모듈
+// v0.9 이중중요성평가 모듈
 // GRI 3 Material Topics 2021 · ESRS 1 · VSME · K-ESG 준수
 // ==========================================================================
 
@@ -2020,7 +2443,7 @@ function MaterialityMatrixV2({ result, width = 640, height = 480 }) {
 }
 
 // ==========================================================================
-// MaterialityPanel (v0.8) - Supabase materiality_sessions에 자동 저장
+// MaterialityPanel (v0.9) - Supabase materiality_sessions에 자동 저장
 // ==========================================================================
 const MAT_KEY = "materiality_v2";
 const MAT_SUBS = [
@@ -2707,7 +3130,416 @@ function ReportPage({ responses, data, setBlockData, MAT_KEY, meta, updateMeta }
   );
 }
 
-// ===== v0.8: 카테고리 자동 METRICS 표 + 미니 그래프 =====
+// ===== v0.9: 서술형 필드용 스마트 선택지 풀 =====
+function getSmartSuggestions(field) {
+  const label = (field.label || "").toLowerCase();
+  const desc  = (field.description || "").toLowerCase();
+  const all   = label + " " + desc;
+
+  const POOL = {
+    policy: [
+      { label: "법규 준수", text: "관련 법규 및 국제 기준을 철저히 준수합니다.", rec: true },
+      { label: "ISO 인증 기반", text: "ISO 국제 표준 기반의 관리체계를 구축·운영하고 있습니다.", rec: true },
+      { label: "지속적 개선", text: "지속적인 성과 모니터링과 개선을 추진합니다.", rec: true },
+      { label: "이해관계자 소통", text: "이해관계자와의 적극적 소통을 통해 요구사항을 경영에 반영합니다." },
+      { label: "최고경영진 감독", text: "최고경영진의 직접적 감독 하에 관리체계를 운영합니다." },
+      { label: "전사 내재화", text: "전 임직원이 일상 업무에서 내재화하고 실천할 수 있도록 지원합니다." },
+    ],
+    target: [
+      { label: "2030년 30% 감축", text: "2024년 기준 2030년까지 30% 감축을 중장기 목표로 설정하였습니다.", rec: true },
+      { label: "2050 탄소중립", text: "2050년 탄소중립(Net-Zero) 달성을 장기 목표로 추진합니다." },
+      { label: "연 5% 개선", text: "연평균 5% 이상의 지속적 성과 개선을 목표로 합니다.", rec: true },
+      { label: "업계 Top 수준", text: "동종업계 Top-tier 수준 달성을 목표로 설정하였습니다." },
+      { label: "무재해·Zero", text: "무재해·Zero 배출 달성을 최종 목표로 추진합니다." },
+    ],
+    management: [
+      { label: "전담 조직", text: "경영진 직속의 전담 조직을 구성하여 운영합니다.", rec: true },
+      { label: "정기 모니터링", text: "분기별 정기 모니터링 및 경영진 보고 체계를 운영합니다.", rec: true },
+      { label: "연간 리스크 평가", text: "연 1회 이상 정기 리스크 평가를 실시합니다." },
+      { label: "통합 관리시스템", text: "전사 통합 관리시스템을 통해 실시간으로 관리합니다." },
+    ],
+    training: [
+      { label: "신규 입사자 의무", text: "신규 입사자 전원을 대상으로 의무 교육을 실시합니다.", rec: true },
+      { label: "연 1회 정기교육", text: "전 임직원 대상 연 1회 이상 정기 교육을 시행합니다.", rec: true },
+      { label: "외부 전문기관 연계", text: "외부 전문기관을 통한 전문 교육을 병행합니다." },
+      { label: "직무별 맞춤교육", text: "직무 특성에 맞는 맞춤형 교육을 운영합니다." },
+    ],
+    safety: [
+      { label: "무재해 목표", text: "'무재해 사업장' 달성을 핵심 목표로 설정하였습니다.", rec: true },
+      { label: "PSM 관리", text: "공정안전보고서(PSM) 체계를 구축·운영합니다." },
+      { label: "위험성 평가", text: "JSA·HAZOP 등 체계적인 위험성 평가를 정기 실시합니다.", rec: true },
+      { label: "비상대응 훈련", text: "최악 시나리오 비상대응 훈련을 정기적으로 실시합니다." },
+    ],
+    environment: [
+      { label: "ISO 14001 인증", text: "전 사업장이 ISO 14001 환경경영시스템 인증을 유지하고 있습니다.", rec: true },
+      { label: "오염물질 저감", text: "대기·수질·폐기물 오염물질의 지속적 저감을 추진합니다.", rec: true },
+      { label: "자원 순환 확대", text: "재활용·재이용을 통한 자원 순환을 확대합니다." },
+      { label: "친환경 원료", text: "친환경 원료·대체물질 전환을 점진적으로 추진합니다." },
+    ],
+    governance: [
+      { label: "이사회 감독", text: "이사회 및 산하 ESG 협의체가 주요 사항을 감독합니다.", rec: true },
+      { label: "내부통제", text: "내부통제 체계를 구축하고 정기 점검을 실시합니다." },
+      { label: "윤리강령 준수", text: "윤리강령 및 행동규범을 제정·준수하고 있습니다.", rec: true },
+      { label: "공정거래 원칙", text: "공정거래 원칙을 준수하며 협력사와의 상생을 추구합니다." },
+    ],
+    community: [
+      { label: "지역상생", text: "지역사회와의 동반 성장을 사회적 책임의 핵심으로 삼고 있습니다.", rec: true },
+      { label: "사회공헌 프로그램", text: "다양한 사회공헌 프로그램을 체계적으로 운영합니다.", rec: true },
+      { label: "취약계층 지원", text: "지역 내 소외·취약계층 지원 활동을 지속합니다." },
+    ],
+  };
+
+  const out = [];
+  const push = arr => arr.forEach(x => out.push(x));
+
+  if (/정책|방침|원칙|규정|기준|체계/.test(all)) push(POOL.policy);
+  if (/목표|target|계획|로드맵|중장기|단기/.test(all)) push(POOL.target);
+  if (/관리|모니터링|운영|감독/.test(all) && out.length < 6) push(POOL.management);
+  if (/교육|훈련|역량/.test(all)) push(POOL.training);
+  if (/안전|보건|재해|위험|psm|safety/.test(all)) push(POOL.safety);
+  if (/환경|오염|저감|자원|순환|배출|용수|폐수|폐기물|에너지|온실|기후/.test(all)) push(POOL.environment);
+  if (/이사회|윤리|지배구조|컴플라이언스|준법|공정/.test(all)) push(POOL.governance);
+  if (/지역사회|사회공헌|기부|봉사|상생/.test(all)) push(POOL.community);
+
+  const seen = new Set();
+  const dedup = [];
+  for (const x of out) {
+    if (!seen.has(x.label)) { seen.add(x.label); dedup.push(x); }
+    if (dedup.length >= 8) break;
+  }
+  return dedup;
+}
+
+// ===== v0.9: 카드 위자드 필드 단일 렌더러 =====
+function CardFieldRenderer({ field, value, onChange }) {
+  const t = field.input_type;
+
+  if (t === "textarea" || t === "text") {
+    const suggestions = getSmartSuggestions(field);
+    const strVal = (value == null) ? "" : String(value);
+    const toggleSuggestion = (s) => {
+      const tag = "• " + s.text;
+      if (strVal.includes(tag)) {
+        onChange(strVal.split("\n").filter(l => l.trim() !== tag).join("\n"));
+      } else {
+        const newVal = strVal.trim() ? strVal.trim() + "\n" + tag : tag;
+        onChange(newVal);
+      }
+    };
+    const isActive = (s) => strVal.includes("• " + s.text);
+
+    return (
+      <div>
+        {suggestions.length > 0 && (
+          <div className="quick-picks">
+            <div className="quick-picks-head">
+              <span>💡 빠른 선택 · 클릭하면 자동으로 문장이 조합됩니다</span>
+              <span>{suggestions.filter(s => isActive(s)).length}개 선택됨</span>
+            </div>
+            <div className="quick-picks-chips">
+              {suggestions.map((s, i) => (
+                <button key={i} type="button"
+                  className={"pick-chip" + (isActive(s) ? " active" : "")}
+                  onClick={() => toggleSuggestion(s)}>
+                  {s.label}
+                  {s.rec && <span className="rec-badge">추천</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <textarea
+          className="card-text-input"
+          value={strVal}
+          onChange={e => onChange(e.target.value)}
+          placeholder={t === "textarea" ? "위 빠른 선택을 클릭하거나 직접 입력하세요..." : "직접 입력하세요"}
+          rows={t === "textarea" ? 6 : 2}
+        />
+      </div>
+    );
+  }
+
+  if (t === "number") {
+    return (
+      <div className="card-number-wrap">
+        <input type="number" className="card-number-input"
+          value={value == null ? "" : value}
+          onChange={e => onChange(e.target.value === "" ? null : parseFloat(e.target.value))}
+          placeholder="0" />
+        {field.unit && <span className="card-number-unit">{field.unit}</span>}
+      </div>
+    );
+  }
+
+  if (t === "boolean") {
+    return (
+      <div className="card-boolean-group">
+        <button type="button"
+          className={"card-boolean-btn yes" + (value === true ? " active" : "")}
+          onClick={() => onChange(true)}>✓ 예 · 해당됨</button>
+        <button type="button"
+          className={"card-boolean-btn no" + (value === false ? " active" : "")}
+          onClick={() => onChange(false)}>✗ 아니오 · 해당 없음</button>
+      </div>
+    );
+  }
+
+  if (t === "select") {
+    const opts = Array.isArray(field.options) ? field.options
+      : (field.options && field.options.items) ? field.options.items : [];
+    return (
+      <div className="card-select-group">
+        {opts.length === 0 && <div style={{ color: "rgba(255,255,255,0.5)" }}>선택지가 정의되지 않았습니다.</div>}
+        {opts.map((o, i) => {
+          const optVal = typeof o === "string" ? o : (o.value ?? o.label);
+          const optLbl = typeof o === "string" ? o : (o.label ?? o.value);
+          return (
+            <button key={i} type="button"
+              className={"card-select-option" + (value === optVal ? " active" : "")}
+              onClick={() => onChange(optVal)}>{optLbl}</button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (t === "multiselect") {
+    const opts = Array.isArray(field.options) ? field.options
+      : (field.options && field.options.items) ? field.options.items : [];
+    const arr = Array.isArray(value) ? value : [];
+    const toggle = (v) => {
+      if (arr.includes(v)) onChange(arr.filter(x => x !== v));
+      else onChange([...arr, v]);
+    };
+    return (
+      <div className="card-select-group">
+        {opts.map((o, i) => {
+          const optVal = typeof o === "string" ? o : (o.value ?? o.label);
+          const optLbl = typeof o === "string" ? o : (o.label ?? o.value);
+          return (
+            <button key={i} type="button"
+              className={"card-select-option" + (arr.includes(optVal) ? " active" : "")}
+              onClick={() => toggle(optVal)}>
+              {arr.includes(optVal) ? "✓ " : ""}{optLbl}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (t === "date") {
+    return <input type="date" className="card-text-input" style={{ minHeight: "auto" }}
+      value={value || ""} onChange={e => onChange(e.target.value)} />;
+  }
+
+  return <FieldInput field={field} value={value} onChange={onChange} />;
+}
+
+// ===== v0.9: 카드 위자드 본체 =====
+function CategoryCardWizard({ fields, currentSite, currentYear, getValue, setFieldValue, onSave, saving, dirtyCount, sites }) {
+  const [cardIndex, setCardIndex] = useState(0);
+  const [showHelp, setShowHelp] = useState(false);
+
+  const validFields = useMemo(() => {
+    return fields.filter(f => !(f.is_by_site && !currentSite));
+  }, [fields, currentSite]);
+
+  useEffect(() => { setCardIndex(0); }, [currentSite?.id, currentYear, fields.length]);
+
+  if (validFields.length === 0) {
+    return (
+      <div className="card-wizard">
+        <div className="card-wizard-complete">
+          <h2>🔒 사업장을 먼저 선택하세요</h2>
+          <p>이 카테고리에는 사업장별 입력 필드가 포함되어 있습니다.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isComplete = cardIndex >= validFields.length;
+
+  if (isComplete) {
+    const totalFilled = validFields.filter(f => {
+      const v = getValue(f);
+      return v !== null && v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0);
+    }).length;
+    return (
+      <div className="card-wizard">
+        <div className="card-wizard-complete">
+          <div style={{ fontSize: 56, marginBottom: 12 }}>🎉</div>
+          <h2>이 카테고리 모든 카드를 넘겼습니다</h2>
+          <p>
+            총 {validFields.length}개 필드 중 <strong style={{ color: "#10b981" }}>{totalFilled}개</strong> 입력 완료 ·
+            <strong style={{ color: "#f59e0b" }}> {validFields.length - totalFilled}개</strong> 미입력
+          </p>
+          {dirtyCount > 0 && (
+            <p style={{ color: "#fbbf24" }}>⚠️ 저장되지 않은 변경사항 {dirtyCount}개 · 저장 버튼을 눌러주세요</p>
+          )}
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 16 }}>
+            <button onClick={() => setCardIndex(0)} style={{ background: "rgba(255,255,255,0.08)", color: "#fff" }}>
+              ↺ 처음부터 다시
+            </button>
+            {dirtyCount > 0 && (
+              <button onClick={onSave} disabled={saving}>
+                {saving ? "저장 중..." : "💾 지금 저장"}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const field = validFields[cardIndex];
+  const value = getValue(field);
+  const pct = ((cardIndex + 1) / validFields.length) * 100;
+
+  const handleNext = async () => {
+    if (dirtyCount >= 5) { await onSave(); }
+    setCardIndex(i => i + 1);
+    setShowHelp(false);
+  };
+
+  return (
+    <div className="card-wizard">
+      <div className="card-wizard-progress">
+        <div className="card-wizard-progress-text">
+          {cardIndex + 1} <span style={{ color: "rgba(255,255,255,0.4)" }}>/ {validFields.length}</span>
+        </div>
+        <div className="card-wizard-progress-bar">
+          <div className="card-wizard-progress-fill" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="card-wizard-progress-text" style={{ color: "rgba(255,255,255,0.5)" }}>
+          {pct.toFixed(0)}%
+        </div>
+      </div>
+
+      <div className="card-wizard-body">
+        <div className="card-wizard-title">
+          <span>{field.label}</span>
+          {field.is_required && <span style={{ color: "#ef4444", fontSize: 20 }}>*</span>}
+          {field.description && (
+            <span style={{ position: "relative" }}>
+              <button className="help-btn" onClick={() => setShowHelp(h => !h)}>?</button>
+              {showHelp && (
+                <div className="help-tooltip">
+                  <div className="help-tooltip-title">💡 이 항목이 뭔가요?</div>
+                  {field.description}
+                </div>
+              )}
+            </span>
+          )}
+        </div>
+
+        {field.description && !showHelp && (
+          <div className="card-wizard-desc">{field.description}</div>
+        )}
+
+        <div className="card-context">
+          {field.is_by_site && currentSite && <span className="card-context-pill">📍 {currentSite.name}</span>}
+          {field.is_by_year && <span className="card-context-pill">📅 {currentYear}년</span>}
+          {!field.is_by_site && !field.is_by_year && <span className="card-context-pill">전사 · 연도 무관</span>}
+          {field.unit && <span className="card-context-pill">단위: {field.unit}</span>}
+          {Array.isArray(field.gri_disclosures) && field.gri_disclosures.map(g => (
+            <span key={g} className="card-gri-pill">GRI {g}</span>
+          ))}
+        </div>
+
+        <CardFieldRenderer field={field} value={value} onChange={v => setFieldValue(field, v)} />
+      </div>
+
+      <div className="card-wizard-nav">
+        <button className="btn-prev"
+          onClick={() => { setCardIndex(i => Math.max(0, i - 1)); setShowHelp(false); }}
+          disabled={cardIndex === 0}>← 이전</button>
+        <button className="btn-skip" onClick={() => { setCardIndex(i => i + 1); setShowHelp(false); }}>
+          건너뛰기
+        </button>
+        <button className="btn-next" onClick={handleNext}>
+          {cardIndex === validFields.length - 1 ? "완료 →" : "저장하고 다음 →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ===== v0.9: 엑셀 템플릿 다운로드 + 업로드 =====
+function ExcelUploadButton({ fields, sites, onUpload }) {
+  function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (typeof XLSX === "undefined") {
+      alert("엑셀 라이브러리 로드 실패. 새로고침 후 다시 시도.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = new Uint8Array(ev.target.result);
+        const wb = XLSX.read(data, { type: "array" });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: null });
+
+        const updates = [];
+        const notFound = [];
+        rows.forEach(row => {
+          const code = row["field_code"] || row["필드코드"] || row["코드"];
+          const label = row["label"] || row["항목"] || row["이름"];
+          const year = row["year"] || row["연도"] || null;
+          const siteName = row["site"] || row["사업장"] || null;
+          const val = row["value"] !== undefined ? row["value"] : row["값"];
+
+          let f = null;
+          if (code) f = fields.find(x => x.field_code === code);
+          if (!f && label) f = fields.find(x => x.label === label);
+          if (!f) { if (label || code) notFound.push(label || code); return; }
+
+          const siteId = siteName ? (sites.find(s => s.name === siteName)?.id || null) : null;
+          updates.push({ fieldId: f.id, field: f, year: year ? parseInt(year) : null, siteId, value: val });
+        });
+        onUpload(updates, notFound);
+      } catch (err) {
+        alert("엑셀 파싱 실패: " + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
+  }
+
+  function downloadTemplate() {
+    if (typeof XLSX === "undefined") return;
+    const data = fields.map(f => ({
+      "field_code": f.field_code,
+      "label": f.label,
+      "year": f.is_by_year ? 2025 : "",
+      "site": f.is_by_site ? (sites[0]?.name || "") : "",
+      "value": "",
+      "단위": f.unit || "",
+      "설명": f.description || "",
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "입력 템플릿");
+    XLSX.writeFile(wb, "ESG_입력_템플릿.xlsx");
+  }
+
+  return (
+    <div style={{ display: "inline-flex", gap: 6 }}>
+      <button type="button" className="excel-upload" onClick={downloadTemplate}
+        style={{ background: "rgba(136,204,255,0.12)", borderColor: "rgba(136,204,255,0.3)", color: "#88ccff" }}>
+        📥 템플릿
+      </button>
+      <label className="excel-upload">
+        📊 엑셀 업로드
+        <input type="file" accept=".xlsx,.xls" onChange={handleFile} />
+      </label>
+    </div>
+  );
+}
+
+// ===== v0.9: 카테고리 자동 METRICS 표 + 미니 그래프 =====
 function formatAutoNum(v) {
   if (v === null || v === undefined) return "-";
   if (!v || v === 0) return "0";
