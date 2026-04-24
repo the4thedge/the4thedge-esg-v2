@@ -3,17 +3,27 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v2</title>
+<title>The 4th Edge · ESG 플랫폼 v0.2</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", Roboto, sans-serif;
     background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    min-height: 100vh;
+    color: #fff;
+  }
+  #root { min-height: 100vh; }
+
+  /* ===== 공통 카드 ===== */
+  .center {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
     padding: 20px;
   }
   .card {
@@ -21,113 +31,491 @@
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 20px;
-    padding: 60px 50px;
-    max-width: 640px;
+    padding: 48px 40px;
     width: 100%;
-    text-align: center;
+    max-width: 480px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   }
+  .card-wide { max-width: 720px; }
   .logo {
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 6px;
     color: #88ccff;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
     font-weight: 600;
+    text-align: center;
   }
   h1 {
-    font-size: 42px;
-    line-height: 1.2;
-    margin-bottom: 16px;
+    font-size: 28px;
+    line-height: 1.25;
+    margin-bottom: 8px;
+    font-weight: 700;
+    text-align: center;
+  }
+  h2 {
+    font-size: 22px;
+    line-height: 1.3;
+    margin-bottom: 8px;
     font-weight: 700;
   }
   .subtitle {
-    font-size: 18px;
-    color: #bbb;
-    margin-bottom: 50px;
+    font-size: 14px;
+    color: #a0b8c8;
+    margin-bottom: 32px;
+    text-align: center;
     line-height: 1.5;
   }
-  .status-box {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
-    padding: 24px;
-    text-align: left;
-    margin-bottom: 30px;
-    font-family: "Consolas", monospace;
-    font-size: 14px;
+
+  /* ===== 입력 ===== */
+  label {
+    display: block;
+    font-size: 13px;
+    color: #a0b8c8;
+    margin-bottom: 6px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
-  .status-row {
+  input[type=email], input[type=password], input[type=text] {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: #fff;
+    font-size: 15px;
+    transition: border 0.15s;
+    font-family: inherit;
+  }
+  input:focus {
+    outline: none;
+    border-color: #88ccff;
+  }
+  .field { margin-bottom: 16px; }
+
+  /* ===== 버튼 ===== */
+  button {
+    background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
+    color: #fff;
+    border: none;
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.12s, box-shadow 0.12s;
+    font-family: inherit;
+  }
+  button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(59,130,246,0.4); }
+  button:active { transform: translateY(0); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  button.ghost {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #a0b8c8;
+    box-shadow: none;
+  }
+  button.ghost:hover { background: rgba(255,255,255,0.05); box-shadow: none; }
+
+  .err {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .muted { color: #6b8290; font-size: 12px; text-align: center; margin-top: 20px; letter-spacing: 1px; }
+
+  /* ===== 회사 선택 ===== */
+  .company-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .company-card {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 20px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .company-card:hover {
+    background: rgba(136, 204, 255, 0.08);
+    border-color: #88ccff;
+    transform: translateY(-2px);
+  }
+  .company-card .cname {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .company-card .ccode {
+    font-size: 11px;
+    color: #6b8290;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ===== 대시보드 ===== */
+  .topbar {
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 24px;
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    align-items: center;
   }
-  .status-row:last-child { border-bottom: none; }
-  .status-label { color: #888; }
-  .status-value { color: #88ccff; font-weight: 600; }
-  .status-ok { color: #4ade80; }
-  .status-pending { color: #fbbf24; }
-  .version {
-    font-size: 12px;
-    color: #666;
-    letter-spacing: 2px;
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .topbar .brand { font-size: 13px; letter-spacing: 4px; color: #88ccff; font-weight: 600; }
+  .topbar .sep { color: #3a546a; }
+  .topbar .company-pill {
+    background: rgba(136, 204, 255, 0.12);
+    border: 1px solid rgba(136, 204, 255, 0.3);
+    color: #88ccff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
   }
+  .topbar-right { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #a0b8c8; }
+  .topbar-right button { width: auto; padding: 7px 14px; font-size: 13px; }
+  .role-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .role-staff { background: rgba(148,163,184,0.2); color: #cbd5e1; }
+  .role-manager { background: rgba(34,197,94,0.2); color: #86efac; }
+  .role-consultant { background: rgba(251,191,36,0.2); color: #fcd34d; }
+
+  .dashboard-body {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+  .placeholder-box {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 60px 40px;
+    text-align: center;
+    margin-top: 24px;
+  }
+  .placeholder-box h2 { margin-bottom: 12px; }
+  .placeholder-box p { color: #a0b8c8; line-height: 1.6; font-size: 14px; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .stat {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .stat .n { font-size: 28px; font-weight: 700; color: #88ccff; }
+  .stat .l { font-size: 12px; color: #6b8290; margin-top: 4px; letter-spacing: 1px; }
+
+  .loading-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #88ccff;
+    animation: pulse 1.4s infinite ease-in-out;
+    margin-right: 4px;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="logo">THE 4TH EDGE</div>
-    <h1>ESG 플랫폼 v2</h1>
-    <p class="subtitle">
-      차세대 ESG 데이터 관리 · 보고 플랫폼<br>
-      GRI 2025 신규표준 · ESRS IG1 · 이중중요성평가 v2
-    </p>
+<div id="root"></div>
 
-    <div class="status-box">
-      <div class="status-row">
-        <span class="status-label">Platform</span>
-        <span class="status-value">the4thedge-esg-v2</span>
-      </div>
-      <div class="status-row">
-        <span class="status-label">Version</span>
-        <span class="status-value">v0.1 · 초기 세팅</span>
-      </div>
-      <div class="status-row">
-        <span class="status-label">Deployment</span>
-        <span class="status-ok">● Vercel 연결됨</span>
-      </div>
-      <div class="status-row">
-        <span class="status-label">Database</span>
-        <span class="status-pending" id="db-status">● 연결 확인 중…</span>
-      </div>
-      <div class="status-row">
-        <span class="status-label">Build</span>
-        <span class="status-value" id="build-time">-</span>
-      </div>
-    </div>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect } = React;
 
-    <div class="version">CONSTRUCTION IN PROGRESS · Q2 2026</div>
-  </div>
+const SUPABASE_URL = "https://ucqqckuzuaeceuabndjw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_YsX59YkLF5vtK83k2DPxBg_6eM0Kev0";
 
-<script type="module">
-  // Supabase 연결 테스트
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const ROLE_LABEL = { staff: "담당자", manager: "매니저", consultant: "컨설턴트" };
 
-  const SUPABASE_URL = "https://ucqqckuzuaeceuabndjw.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_YsX59YkLF5vtK83k2DPxBg_6eM0Kev0";
+// ====== Supabase 동적 로드 ======
+function useSupabase() {
+  const [sb, setSb] = useState(null);
+  useEffect(() => {
+    import("https://esm.sh/@supabase/supabase-js@2").then(m => {
+      setSb(m.createClient(SUPABASE_URL, SUPABASE_KEY));
+    });
+  }, []);
+  return sb;
+}
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// ====== 로그인 뷰 ======
+function LoginView({ supabase, onSuccess }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  // 단순 ping (auth 상태만 확인)
-  try {
-    const { data, error } = await supabase.auth.getSession();
-    document.getElementById("db-status").textContent = "● Supabase 연결됨";
-    document.getElementById("db-status").className = "status-ok";
-  } catch (e) {
-    document.getElementById("db-status").textContent = "● 연결 실패: " + e.message;
+  async function submit(e) {
+    e.preventDefault();
+    setErr("");
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (error) {
+      setErr("로그인 실패 · " + error.message);
+    }
   }
 
-  // Build time
-  document.getElementById("build-time").textContent = new Date().toISOString().slice(0,16).replace("T"," ");
+  return (
+    <div className="center">
+      <div className="card">
+        <div className="logo">THE 4TH EDGE</div>
+        <h1>ESG 플랫폼</h1>
+        <p className="subtitle">GRI 2025 신규표준 · ESRS IG1 · 이중중요성평가 v2</p>
+        {err && <div className="err">{err}</div>}
+        <form onSubmit={submit}>
+          <div className="field">
+            <label>이메일</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoFocus />
+          </div>
+          <div className="field">
+            <label>비밀번호</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          </div>
+          <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
+        </form>
+        <div className="muted">v0.2 · 로그인 시스템</div>
+      </div>
+    </div>
+  );
+}
+
+// ====== 회사 선택 뷰 ======
+function CompanyPickerView({ profile, companies, onPick, onLogout }) {
+  return (
+    <div className="center">
+      <div className="card card-wide">
+        <div className="logo">THE 4TH EDGE</div>
+        <h1>회사 선택</h1>
+        <p className="subtitle">
+          {profile.full_name || profile.email} · {ROLE_LABEL[profile.role] || profile.role}
+          <br />
+          작업할 회사를 선택하세요
+        </p>
+        {companies.length === 0 ? (
+          <div className="err">
+            접근 가능한 회사가 없습니다. 관리자에게 companies 배열 할당을 요청하세요.
+          </div>
+        ) : (
+          <div className="company-grid">
+            {companies.map(c => (
+              <button key={c.id} className="company-card" onClick={() => onPick(c)}>
+                <div className="cname">{c.name}</div>
+                <div className="ccode">{c.code || c.id.slice(0, 8)}</div>
+              </button>
+            ))}
+          </div>
+        )}
+        <div style={{ marginTop: 28, textAlign: "center" }}>
+          <button className="ghost" onClick={onLogout} style={{ width: "auto", padding: "8px 18px" }}>로그아웃</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ====== 대시보드 껍데기 ======
+function DashboardShell({ profile, company, onChangeCompany, onLogout }) {
+  return (
+    <div>
+      <div className="topbar">
+        <div className="topbar-left">
+          <span className="brand">THE 4TH EDGE</span>
+          <span className="sep">·</span>
+          <span className="company-pill">{company.name}</span>
+          {profile.role === "consultant" || (profile.companies && profile.companies.length > 1) ? (
+            <button className="ghost" onClick={onChangeCompany} style={{ width: "auto", padding: "4px 10px", fontSize: 12 }}>회사 변경</button>
+          ) : null}
+        </div>
+        <div className="topbar-right">
+          <span>{profile.full_name || profile.email}</span>
+          <span className={`role-badge role-${profile.role}`}>{ROLE_LABEL[profile.role] || profile.role}</span>
+          <button className="ghost" onClick={onLogout}>로그아웃</button>
+        </div>
+      </div>
+
+      <div className="dashboard-body">
+        <h2>{company.name} · ESG 데이터 대시보드</h2>
+        <p style={{ color: "#a0b8c8", marginTop: 6, fontSize: 14 }}>
+          24개 메뉴 · 578개 입력 필드 · GRI 2025 신규표준 준거
+        </p>
+
+        <div className="stats-grid">
+          <div className="stat"><div className="n">24</div><div className="l">MENU</div></div>
+          <div className="stat"><div className="n">578</div><div className="l">FIELDS</div></div>
+          <div className="stat"><div className="n">140</div><div className="l">GRI DISCLOSURES</div></div>
+          <div className="stat"><div className="n">0</div><div className="l">INPUT PROGRESS</div></div>
+        </div>
+
+        <div className="placeholder-box">
+          <h2>🚧 v0.3 사이드바 · v0.4 입력폼 구현 예정</h2>
+          <p>
+            로그인 + 회사 선택 시스템이 정상 작동합니다.<br />
+            다음 단계: 24개 카테고리 사이드바 렌더링 → 첫 카테고리 입력폼 구현
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ====== 에러 뷰 ======
+function ErrorView({ message, onLogout }) {
+  return (
+    <div className="center">
+      <div className="card">
+        <div className="logo">THE 4TH EDGE</div>
+        <h1>⚠️ 프로필 오류</h1>
+        <div className="err" style={{ marginTop: 20 }}>{message}</div>
+        <p style={{ color: "#a0b8c8", fontSize: 13, lineHeight: 1.6, marginBottom: 20 }}>
+          Supabase 대시보드 → SQL Editor에서 v0_2_setup.sql의 users INSERT 구문을 실행했는지 확인하세요.
+        </p>
+        <button className="ghost" onClick={onLogout}>로그아웃</button>
+      </div>
+    </div>
+  );
+}
+
+// ====== 로딩 뷰 ======
+function LoadingView() {
+  return (
+    <div className="center">
+      <div className="card">
+        <div style={{ textAlign: "center" }}>
+          <span className="loading-dot"></span>
+          <span className="loading-dot" style={{ animationDelay: "0.2s" }}></span>
+          <span className="loading-dot" style={{ animationDelay: "0.4s" }}></span>
+        </div>
+        <p style={{ textAlign: "center", marginTop: 16, color: "#a0b8c8", fontSize: 14 }}>연결 중…</p>
+      </div>
+    </div>
+  );
+}
+
+// ====== 앱 본체 ======
+function App() {
+  const supabase = useSupabase();
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [companies, setCompanies] = useState([]);
+  const [picked, setPicked] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [profileErr, setProfileErr] = useState("");
+
+  // 세션 구독
+  useEffect(() => {
+    if (!supabase) return;
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setSession(data.session);
+      setLoading(false);
+    });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSession(s);
+      if (!s) {
+        setProfile(null);
+        setCompanies([]);
+        setPicked(null);
+        setProfileErr("");
+      }
+    });
+    return () => { mounted = false; sub.subscription.unsubscribe(); };
+  }, [supabase]);
+
+  // 프로필 + 회사 로드
+  useEffect(() => {
+    if (!supabase || !session) return;
+    let alive = true;
+    (async () => {
+      setProfileErr("");
+      // 1) users 프로필
+      const { data: prof, error: pe } = await supabase
+        .from("users")
+        .select("id, email, full_name, role, companies")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (!alive) return;
+
+      if (pe) {
+        setProfileErr("users 테이블 조회 실패: " + pe.message);
+        return;
+      }
+      if (!prof) {
+        setProfileErr(`users 테이블에 ${session.user.email} 프로필이 없습니다. SQL로 INSERT 필요.`);
+        return;
+      }
+      setProfile(prof);
+
+      // 2) 회사 목록
+      let q = supabase.from("companies").select("id, code, name").order("name");
+      if (prof.role !== "consultant") {
+        q = q.in("id", prof.companies || []);
+      }
+      const { data: cs, error: ce } = await q;
+      if (!alive) return;
+      if (ce) {
+        setProfileErr("companies 조회 실패: " + ce.message);
+        return;
+      }
+      setCompanies(cs || []);
+      if ((cs || []).length === 1) setPicked(cs[0]);
+    })();
+    return () => { alive = false; };
+  }, [supabase, session]);
+
+  async function handleLogout() {
+    if (supabase) await supabase.auth.signOut();
+  }
+
+  if (!supabase || loading) return <LoadingView />;
+  if (!session) return <LoginView supabase={supabase} />;
+  if (profileErr) return <ErrorView message={profileErr} onLogout={handleLogout} />;
+  if (!profile) return <LoadingView />;
+  if (!picked) return (
+    <CompanyPickerView
+      profile={profile}
+      companies={companies}
+      onPick={setPicked}
+      onLogout={handleLogout}
+    />
+  );
+  return (
+    <DashboardShell
+      profile={profile}
+      company={picked}
+      onChangeCompany={() => setPicked(null)}
+      onLogout={handleLogout}
+    />
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
