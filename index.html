@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v0.7</title>
+<title>The 4th Edge · ESG 플랫폼 v0.8</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -279,7 +279,7 @@
   }
   @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-  /* ===== v0.5: 입력폼 · v0.7: 이중중요성평가 추가 ===== */
+  /* ===== v0.5: 입력폼 · v0.8: 이중중요성평가 추가 ===== */
   .edit-toolbar {
     display: flex; gap: 20px; align-items: center;
     margin-bottom: 24px; padding: 14px 16px;
@@ -420,7 +420,7 @@
   .empty-note {
     color: #6b8290; font-size: 13px; padding: 8px 0;
   }
-  /* ===== v0.7: 이중중요성평가 라이트 테마 ===== */
+  /* ===== v0.8: 이중중요성평가 라이트 테마 ===== */
   .main-light {
     background: #f9fafb !important;
     color: #111827;
@@ -467,6 +467,144 @@
   }
   .mat-saving.saving { color: #d97706; border-color: #fcd34d; background: #fffbeb; }
   .mat-saving.saved { color: #059669; border-color: #a7f3d0; background: #ecfdf5; }
+  /* ===== v0.8: 카테고리 자동 METRICS 표 ===== */
+  .auto-summary-block {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .auto-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .auto-summary-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+  .auto-summary-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+  }
+  .auto-summary-copy {
+    background: rgba(136, 204, 255, 0.15);
+    color: #88ccff;
+    border: 1px solid rgba(136, 204, 255, 0.3);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .auto-summary-copy:hover {
+    background: rgba(136, 204, 255, 0.25);
+  }
+  .auto-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .auto-summary-table th {
+    background: rgba(255,255,255,0.06);
+    padding: 10px 14px;
+    text-align: left;
+    color: rgba(255,255,255,0.8);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .auto-summary-table th.latest { color: #10b981; }
+  .auto-summary-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.85);
+  }
+  .auto-summary-table .row-label { font-weight: 500; }
+  .auto-summary-table .row-unit {
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+  }
+  .auto-summary-table .row-num {
+    text-align: right;
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
+  }
+  .auto-summary-table .row-num.latest {
+    color: #10b981;
+    font-weight: 600;
+  }
+  .auto-summary-table .row-delta {
+    text-align: right;
+    font-size: 12px;
+    font-feature-settings: 'tnum';
+  }
+  .auto-summary-table .row-delta.up { color: #ef4444; }
+  .auto-summary-table .row-delta.down { color: #10b981; }
+  .auto-summary-empty {
+    padding: 24px;
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+  }
+  .auto-summary-missing {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px;
+    font-size: 11px;
+    color: rgba(245,158,11,0.9);
+  }
+  .auto-summary-report {
+    margin-top: 20px;
+    padding: 16px 18px;
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 10px;
+  }
+  .auto-summary-report h4 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #c4b5fd;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .auto-summary-report-item {
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .auto-summary-report-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .auto-summary-report-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .auto-summary-report-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
 </style>
 </head>
 <body>
@@ -558,7 +696,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v0.7 · 실시간 대시보드</div>
+        <div className="muted">v0.8 · 실시간 대시보드</div>
       </div>
     </div>
   );
@@ -1373,16 +1511,25 @@ function CategoryEditPane({ category, company, supabase, profile }) {
           <p>이 카테고리에는 아직 필드가 정의되지 않았습니다.</p>
         </div>
       ) : (
-        <div className="field-list">
-          {fields.map(f => (
-            <FieldRow key={f.id}
-              field={f}
-              value={getValue(f)}
-              onChange={v => setFieldValue(f, v)}
-              currentSite={currentSite}
-              currentYear={currentYear} />
-          ))}
-        </div>
+        <>
+          <CategoryAutoSummary
+            fields={fields}
+            inputs={inputs}
+            sites={sites}
+            categoryName={category.name}
+            categoryCode={category.code}
+          />
+          <div className="field-list">
+            {fields.map(f => (
+              <FieldRow key={f.id}
+                field={f}
+                value={getValue(f)}
+                onChange={v => setFieldValue(f, v)}
+                currentSite={currentSite}
+                currentYear={currentYear} />
+            ))}
+          </div>
+        </>
       )}
     </>
   );
@@ -1426,7 +1573,7 @@ function DashboardShell({ profile, company, supabase, onChangeCompany, onLogout 
     return () => { alive = false; };
   }, [supabase, company.id]);
 
-  // v0.7: 이중중요성평가 카테고리 판별
+  // v0.8: 이중중요성평가 카테고리 판별
   const isMateriality = selected && (
     selected.code === 'materiality_v2' ||
     selected.code === 'materiality' ||
@@ -1579,7 +1726,7 @@ function App() {
 }
 
 // ==========================================================================
-// v0.7 이중중요성평가 모듈
+// v0.8 이중중요성평가 모듈
 // GRI 3 Material Topics 2021 · ESRS 1 · VSME · K-ESG 준수
 // ==========================================================================
 
@@ -1873,7 +2020,7 @@ function MaterialityMatrixV2({ result, width = 640, height = 480 }) {
 }
 
 // ==========================================================================
-// MaterialityPanel (v0.7) - Supabase materiality_sessions에 자동 저장
+// MaterialityPanel (v0.8) - Supabase materiality_sessions에 자동 저장
 // ==========================================================================
 const MAT_KEY = "materiality_v2";
 const MAT_SUBS = [
@@ -2556,6 +2703,262 @@ function ReportPage({ responses, data, setBlockData, MAT_KEY, meta, updateMeta }
       <div style={{ background: "#eff6ff", border: "1px solid #3b82f6", borderRadius: 8, padding: 14, fontSize: 12, color: "#1e40af" }}>
         💡 이 문단은 <strong>GRI 3 Material Topics 2021 공시 요건</strong>을 충족하는 골격입니다. 회사 맥락을 추가로 반영하시기 바랍니다.
       </div>
+    </div>
+  );
+}
+
+// ===== v0.8: 카테고리 자동 METRICS 표 + 미니 그래프 =====
+function formatAutoNum(v) {
+  if (v === null || v === undefined) return "-";
+  if (!v || v === 0) return "0";
+  if (Math.abs(v) >= 1000) return v.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  if (Math.abs(v) >= 10) return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
+function AutoBarChart({ rows }) {
+  const top = rows.slice(0, 6);
+  if (top.length === 0) return null;
+  const W = 720, H = 260;
+  const M = { top: 20, right: 20, bottom: 80, left: 80 };
+  const PW = W - M.left - M.right;
+  const PH = H - M.top - M.bottom;
+  const groupW = PW / top.length;
+  const allVals = top.flatMap(r => [r.v2023, r.v2024, r.v2025]);
+  const maxVal = Math.max(...allVals, 1);
+  const niceMax = maxVal * 1.15;
+  const COL = { c23: "#6b7280", c24: "#3b82f6", c25: "#10b981" };
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", maxHeight: 320, marginTop: 16, display: "block" }}>
+      {[0, 0.25, 0.5, 0.75, 1].map(r => {
+        const y = M.top + PH * (1 - r);
+        return (
+          <g key={r}>
+            <line x1={M.left} y1={y} x2={M.left + PW} y2={y} stroke="rgba(255,255,255,0.08)" strokeDasharray="2 4" />
+            <text x={M.left - 8} y={y + 4} textAnchor="end" fontSize="10" fill="rgba(255,255,255,0.5)">{formatAutoNum(niceMax * r)}</text>
+          </g>
+        );
+      })}
+      <line x1={M.left} y1={M.top + PH} x2={M.left + PW} y2={M.top + PH} stroke="rgba(255,255,255,0.3)" />
+      {top.map((r, i) => {
+        const gx = M.left + groupW * i + groupW / 2;
+        const items = [
+          { v: r.v2023, c: COL.c23, y: 2023 },
+          { v: r.v2024, c: COL.c24, y: 2024 },
+          { v: r.v2025, c: COL.c25, y: 2025 },
+        ];
+        const barW = 18;
+        const gap = 3;
+        const totalW = items.length * barW + (items.length - 1) * gap;
+        const sx = gx - totalW / 2;
+        const lbl = r.field.label.length > 12 ? r.field.label.slice(0, 12) + "…" : r.field.label;
+        return (
+          <g key={r.field.id}>
+            {items.map((it, j) => {
+              const h = it.v > 0 ? (it.v / niceMax) * PH : 0;
+              const bx = sx + j * (barW + gap);
+              const by = M.top + PH - h;
+              return (
+                <g key={j}>
+                  <rect x={bx} y={by} width={barW} height={h} fill={it.c} rx="2">
+                    <title>{r.field.label} ({it.y}): {formatAutoNum(it.v)} {r.field.unit || ""}</title>
+                  </rect>
+                </g>
+              );
+            })}
+            <text x={gx} y={M.top + PH + 18} textAnchor="middle" fontSize="10" fill="rgba(255,255,255,0.75)">{lbl}</text>
+            {r.field.unit && <text x={gx} y={M.top + PH + 32} textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.4)">({r.field.unit})</text>}
+          </g>
+        );
+      })}
+      <g transform={`translate(${M.left}, ${H - 18})`}>
+        {[{ lbl: "2023", c: COL.c23 }, { lbl: "2024", c: COL.c24 }, { lbl: "2025", c: COL.c25 }].map((it, i) => (
+          <g key={i} transform={`translate(${i * 70}, 0)`}>
+            <rect width="10" height="10" fill={it.c} rx="2" />
+            <text x="14" y="9" fontSize="11" fill="rgba(255,255,255,0.75)">{it.lbl}</text>
+          </g>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+function CategoryAutoSummary({ fields, inputs, sites, categoryName, categoryCode }) {
+  if (!fields || fields.length === 0) return null;
+
+  const tableFields = fields.filter(f => f.input_type === "number" && f.is_by_year);
+  const narrativeFields = fields.filter(f => (f.input_type === "textarea" || f.input_type === "text") && !f.is_by_year);
+
+  // 연도별 전사 합계 (is_by_site이면 사업장 모두 합산)
+  function getYearSum(field, year) {
+    let sum = 0, any = false;
+    if (field.is_by_site) {
+      (sites || []).forEach(s => {
+        const row = inputs[inputKey(field.id, s.id, year)];
+        if (row && row.value_number !== null && row.value_number !== undefined) {
+          const v = parseFloat(row.value_number);
+          if (!isNaN(v)) { sum += v; any = true; }
+        }
+      });
+    } else {
+      const row = inputs[inputKey(field.id, null, year)];
+      if (row && row.value_number !== null && row.value_number !== undefined) {
+        const v = parseFloat(row.value_number);
+        if (!isNaN(v)) { sum += v; any = true; }
+      }
+    }
+    return { sum, any };
+  }
+
+  const allRows = tableFields.map(f => {
+    const r23 = getYearSum(f, 2023);
+    const r24 = getYearSum(f, 2024);
+    const r25 = getYearSum(f, 2025);
+    const hasAny = r23.any || r24.any || r25.any;
+    const delta = r25.sum - r24.sum;
+    const deltaPct = (r24.any && r24.sum !== 0) ? ((r25.sum - r24.sum) / r24.sum * 100) : null;
+    return {
+      field: f,
+      v2023: r23.sum, v2024: r24.sum, v2025: r25.sum,
+      has2023: r23.any, has2024: r24.any, has2025: r25.any,
+      hasAny, delta, deltaPct,
+    };
+  });
+
+  const filledRows = allRows.filter(r => r.hasAny);
+  const emptyRows = allRows.filter(r => !r.hasAny);
+
+  // 서술형 필드 (POLICY/ACTIONS/TARGETS 자동 판별)
+  function classifyNarrative(f) {
+    const text = ((f.label || "") + " " + (f.description || "")).toLowerCase();
+    if (/정책|policy|방침|원칙|규정/.test(text)) return "POLICY";
+    if (/목표|target|중장기|단기|계획|로드맵/.test(text)) return "TARGETS";
+    if (/활동|action|이니셔티브|프로그램|실행|조치|관리/.test(text)) return "ACTIONS";
+    return "ACTIONS";
+  }
+  const narrativeByType = { POLICY: [], ACTIONS: [], TARGETS: [] };
+  narrativeFields.forEach(f => {
+    const row = inputs[inputKey(f.id, f.is_by_site ? (sites[0]?.id) : null, 0)];
+    const val = row && row.value_text ? String(row.value_text).trim() : "";
+    if (val) narrativeByType[classifyNarrative(f)].push({ label: f.label, text: val });
+  });
+
+  const hasNarrative = narrativeByType.POLICY.length + narrativeByType.ACTIONS.length + narrativeByType.TARGETS.length > 0;
+
+  // Markdown 표 복사
+  function buildMdTable() {
+    let md = `## ${categoryName}${categoryCode ? " · " + categoryCode : ""} — METRICS\n\n`;
+    md += "| 구분 | 단위 | 2023 | 2024 | 2025 | 전년 대비 |\n";
+    md += "|---|---|---:|---:|---:|---:|\n";
+    filledRows.forEach(r => {
+      const pct = r.deltaPct !== null && !isNaN(r.deltaPct)
+        ? `${r.deltaPct > 0 ? "▲" : r.deltaPct < 0 ? "▼" : "-"} ${Math.abs(r.deltaPct).toFixed(1)}%`
+        : "-";
+      md += `| ${r.field.label} | ${r.field.unit || "-"} | ${formatAutoNum(r.v2023)} | ${formatAutoNum(r.v2024)} | ${formatAutoNum(r.v2025)} | ${pct} |\n`;
+    });
+    return md;
+  }
+
+  function copyTable() {
+    const md = buildMdTable();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(md).then(
+        () => alert("📋 보고서용 표가 클립보드에 복사되었습니다.\n\n워드/노션/보고서에 Ctrl+V로 붙여넣기 하세요."),
+        () => alert("❌ 복사 실패. 브라우저에서 클립보드 권한을 허용해주세요.")
+      );
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = md; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); alert("📋 보고서용 표가 복사되었습니다."); }
+      catch (e) { alert("❌ 복사 실패"); }
+      document.body.removeChild(ta);
+    }
+  }
+
+  if (tableFields.length === 0 && !hasNarrative) return null;
+
+  return (
+    <div className="auto-summary-block">
+      <div className="auto-summary-header">
+        <div>
+          <div className="auto-summary-title">📊 METRICS · 보고서 자동 생성 표</div>
+          <div className="auto-summary-sub">
+            {tableFields.length > 0
+              ? `${filledRows.length}개 입력됨 / ${tableFields.length}개 필드 · 2023·2024·2025 전사 합계`
+              : "숫자형 필드 없음"}
+          </div>
+        </div>
+        {filledRows.length > 0 && (
+          <button className="auto-summary-copy" onClick={copyTable}>
+            📋 보고서용 복사
+          </button>
+        )}
+      </div>
+
+      {tableFields.length > 0 && (
+        filledRows.length > 0 ? (
+          <>
+            <table className="auto-summary-table">
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>단위</th>
+                  <th style={{ textAlign: "right" }}>2023</th>
+                  <th style={{ textAlign: "right" }}>2024</th>
+                  <th className="latest" style={{ textAlign: "right" }}>2025</th>
+                  <th style={{ textAlign: "right" }}>전년 대비</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filledRows.map(r => (
+                  <tr key={r.field.id}>
+                    <td className="row-label">{r.field.label}</td>
+                    <td className="row-unit">{r.field.unit || "-"}</td>
+                    <td className="row-num">{r.has2023 ? formatAutoNum(r.v2023) : "-"}</td>
+                    <td className="row-num">{r.has2024 ? formatAutoNum(r.v2024) : "-"}</td>
+                    <td className="row-num latest">{r.has2025 ? formatAutoNum(r.v2025) : "-"}</td>
+                    <td className={"row-delta " + (r.deltaPct !== null ? (r.deltaPct > 0 ? "up" : r.deltaPct < 0 ? "down" : "") : "")}>
+                      {r.deltaPct !== null && !isNaN(r.deltaPct)
+                        ? (r.deltaPct === 0 ? "—" : (r.deltaPct > 0 ? "▲" : "▼") + " " + Math.abs(r.deltaPct).toFixed(1) + "%")
+                        : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <AutoBarChart rows={filledRows} />
+            {emptyRows.length > 0 && (
+              <div className="auto-summary-missing">
+                💡 아직 입력되지 않은 필드 ({emptyRows.length}개): {emptyRows.slice(0, 5).map(r => r.field.label).join(", ")}
+                {emptyRows.length > 5 ? ` 외 ${emptyRows.length - 5}개` : ""}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="auto-summary-empty">
+            아직 입력된 숫자 데이터가 없습니다.<br/>
+            아래 입력 필드에 2023·2024·2025 값을 입력하면 보고서용 표가 자동 생성됩니다.
+          </div>
+        )
+      )}
+
+      {hasNarrative && (
+        <div className="auto-summary-report">
+          <h4>📝 POLICY · ACTIONS · TARGETS 서술 자동 집계</h4>
+          {["POLICY", "ACTIONS", "TARGETS"].map(k => (
+            narrativeByType[k].length > 0 && (
+              <div key={k} className="auto-summary-report-item">
+                <div className="auto-summary-report-label">{k}</div>
+                {narrativeByType[k].map((it, i) => (
+                  <div key={i} className="auto-summary-report-text">
+                    <strong style={{ color: "rgba(196,181,253,0.9)" }}>• {it.label}</strong>: {it.text}
+                  </div>
+                ))}
+              </div>
+            )
+          ))}
+        </div>
+      )}
     </div>
   );
 }
