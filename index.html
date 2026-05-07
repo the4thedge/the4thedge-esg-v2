@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v1.1</title>
+<title>The 4th Edge · ESG 플랫폼 v1.2</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -1065,7 +1065,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v1.1 · 실시간 대시보드</div>
+        <div className="muted">v1.2 · 실시간 대시보드</div>
       </div>
     </div>
   );
@@ -1249,7 +1249,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
 
   // ===== Scope 1·2·3 연도별 합계 =====
   const scopeByYear = useMemo(() => {
-    const by = { 2023: { s1: 0, s2: 0, s3: 0 }, 2024: { s1: 0, s2: 0, s3: 0 }, 2025: { s1: 0, s2: 0, s3: 0 } };
+    const by = { 2022: { s1: 0, s2: 0, s3: 0 }, 2023: { s1: 0, s2: 0, s3: 0 }, 2024: { s1: 0, s2: 0, s3: 0 } };
     const fieldMap = {};
     fields.forEach(f => { fieldMap[f.id] = f; });
     inputs.forEach(inp => {
@@ -1259,9 +1259,10 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
       if (!by[inp.year] || !v) return;
       const griList = Array.isArray(f.gri_disclosures) ? f.gri_disclosures : [];
       const hit = (code) => griList.some(d => typeof d === "string" && d.includes(code));
-      if (hit("102-5")) by[inp.year].s1 += v;
-      else if (hit("102-6")) by[inp.year].s2 += v;
-      else if (hit("102-7")) by[inp.year].s3 += v;
+      const isCO2eq = f.unit === "tCO2eq";
+      if (isCO2eq && hit("102-5")) by[inp.year].s1 += v;
+      else if (isCO2eq && hit("102-6")) by[inp.year].s2 += v;
+      else if (isCO2eq && hit("102-7")) by[inp.year].s3 += v;
     });
     return by;
   }, [inputs, fields]);
@@ -1324,7 +1325,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
 
   // ===== 3년 추세 SVG =====
   const renderScopeTrendSVG = () => {
-    const years = [2023, 2024, 2025];
+    const years = [2022, 2023, 2024];
     const COL = { s1: "#ef4444", s2: "#f59e0b", s3: "#8b5cf6" };
     const allVals = years.flatMap(y => [scopeByYear[y].s1, scopeByYear[y].s2, scopeByYear[y].s3]);
     const maxVal = Math.max(...allVals, 1);
