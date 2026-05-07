@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v1.2</title>
+<title>The 4th Edge · ESG 플랫폼 v1.3</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -1065,7 +1065,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v1.2 · 실시간 대시보드</div>
+        <div className="muted">v1.3 · 실시간 대시보드</div>
       </div>
     </div>
   );
@@ -1465,17 +1465,17 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
           <h3 style={{ margin: 0 }}>📈 Scope 1·2·3 온실가스 배출량 3년 추세</h3>
           {(() => {
+            const t2023 = scopeByYear[2023].s1 + scopeByYear[2023].s2 + scopeByYear[2023].s3;
             const t2024 = scopeByYear[2024].s1 + scopeByYear[2024].s2 + scopeByYear[2024].s3;
-            const t2025 = scopeByYear[2025].s1 + scopeByYear[2025].s2 + scopeByYear[2025].s3;
-            if (t2024 <= 0 || t2025 <= 0) return null;
-            const pct = (t2025 - t2024) / t2024 * 100;
+            if (t2023 <= 0 || t2024 <= 0) return null;
+            const pct = (t2024 - t2023) / t2023 * 100;
             return (
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 4,
                 background: pct < 0 ? "rgba(16,185,129,0.2)" : "rgba(239,68,68,0.2)",
                 color: pct < 0 ? "#10b981" : "#ef4444",
               }}>
-                2024 → 2025 전년 대비 {pct < 0 ? "▼" : "▲"} {Math.abs(pct).toFixed(1)}%
+                2023 → 2024 전년 대비 {pct < 0 ? "▼" : "▲"} {Math.abs(pct).toFixed(1)}%
               </span>
             );
           })()}
