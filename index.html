@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v1.0</title>
+<title>The 4th Edge · ESG 플랫폼 v1.1</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -1065,7 +1065,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v1.0 · 실시간 대시보드</div>
+        <div className="muted">v1.1 · 실시간 대시보드</div>
       </div>
     </div>
   );
@@ -1259,9 +1259,9 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
       if (!by[inp.year] || !v) return;
       const griList = Array.isArray(f.gri_disclosures) ? f.gri_disclosures : [];
       const hit = (code) => griList.some(d => typeof d === "string" && d.includes(code));
-      if (hit("305-1")) by[inp.year].s1 += v;
-      else if (hit("305-2")) by[inp.year].s2 += v;
-      else if (hit("305-3")) by[inp.year].s3 += v;
+      if (hit("102-5")) by[inp.year].s1 += v;
+      else if (hit("102-6")) by[inp.year].s2 += v;
+      else if (hit("102-7")) by[inp.year].s3 += v;
     });
     return by;
   }, [inputs, fields]);
@@ -1404,7 +1404,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
 
         {!hasData && (
           <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="14" fill="rgba(255,255,255,0.4)">
-            GRI 305-1·305-2·305-3 연계 필드 입력 시 자동 표시됩니다
+            GRI 102-5·102-6·102-7 (기후변화 2025) 연계 필드 입력 시 자동 표시됩니다
           </text>
         )}
       </svg>
@@ -1480,7 +1480,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
           })()}
         </div>
         <p style={{ fontSize: 12, marginBottom: 14, color: "rgba(255,255,255,0.55)" }}>
-          GRI 305-1·305-2·305-3 연계 필드의 연도별 합계 · 단위: tCO₂eq
+          GRI 102-5·102-6·102-7 (기후변화 2025) 연계 필드의 연도별 합계 · 단위: tCO₂eq
         </p>
         {renderScopeTrendSVG()}
       </div>
