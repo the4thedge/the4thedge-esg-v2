@@ -13,9 +13,9 @@
   html, body { height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", Roboto, sans-serif;
-    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    background: #f9fafb;
     min-height: 100vh;
-    color: #fff;
+    color: #1f2937;
     overflow: hidden;
   }
   #root { min-height: 100vh; height: 100vh; }
@@ -30,60 +30,60 @@
     overflow: auto;
   }
   .card {
-    background: rgba(255, 255, 255, 0.08);
+    background: #ffffff;
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid #e5e7eb;
     border-radius: 20px;
     padding: 48px 40px;
     width: 100%;
     max-width: 480px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
   }
   .card-wide { max-width: 720px; }
   .logo {
-    font-size: 13px; letter-spacing: 6px; color: #88ccff;
+    font-size: 13px; letter-spacing: 6px; color: #16a34a;
     margin-bottom: 14px; font-weight: 600; text-align: center;
   }
-  h1 {
+  h1 { color: #111827;
     font-size: 28px; line-height: 1.25; margin-bottom: 8px;
     font-weight: 700; text-align: center;
   }
-  h2 { font-size: 22px; line-height: 1.3; margin-bottom: 8px; font-weight: 700; }
+  h2 { color: #111827; font-size: 22px; line-height: 1.3; margin-bottom: 8px; font-weight: 700; }
   .subtitle {
-    font-size: 14px; color: #a0b8c8; margin-bottom: 32px;
+    font-size: 14px; color: #6b7280; margin-bottom: 32px;
     text-align: center; line-height: 1.5;
   }
   label {
-    display: block; font-size: 13px; color: #a0b8c8;
+    display: block; font-size: 13px; color: #6b7280;
     margin-bottom: 6px; font-weight: 600; letter-spacing: 0.5px;
   }
   input[type=email], input[type=password], input[type=text] {
-    width: 100%; background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px;
-    padding: 13px 16px; color: #fff; font-size: 15px;
+    width: 100%; background: #ffffff;
+    border: 1px solid #e5e7eb; border-radius: 10px;
+    padding: 13px 16px; color: #1a1a1a; font-size: 15px;
     transition: border 0.15s; font-family: inherit;
   }
-  input:focus { outline: none; border-color: #88ccff; }
+  input:focus { outline: none; border-color: #16a34a; }
   .field { margin-bottom: 16px; }
 
   button {
-    background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
-    color: #fff; border: none; padding: 13px 20px; border-radius: 10px;
+    background: #16a34a;
+    color: #1a1a1a; border: none; padding: 13px 20px; border-radius: 10px;
     font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
     transition: transform 0.12s, box-shadow 0.12s; font-family: inherit;
   }
-  button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(59,130,246,0.4); }
+  button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,163,74,0.25); }
   button:active { transform: translateY(0); }
   button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   button.ghost {
     background: transparent; border: 1px solid rgba(255,255,255,0.2);
-    color: #a0b8c8; box-shadow: none;
+    color: #6b7280; box-shadow: none;
   }
-  button.ghost:hover { background: rgba(255,255,255,0.05); box-shadow: none; }
+  button.ghost:hover { background: #f9fafb; box-shadow: none; }
 
   .err {
-    background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #fca5a5; padding: 12px 14px; border-radius: 8px; font-size: 13px;
+    background: #fee2e2; border: 1px solid #fecaca;
+    color: #991b1b; padding: 12px 14px; border-radius: 8px; font-size: 13px;
     margin-bottom: 16px; line-height: 1.5;
   }
   .muted {
@@ -97,12 +97,12 @@
     gap: 12px; margin-top: 24px;
   }
   .company-card {
-    background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #f9fafb; border: 1px solid #e5e7eb;
     border-radius: 12px; padding: 20px 18px; cursor: pointer;
     transition: all 0.15s; text-align: left;
   }
   .company-card:hover {
-    background: rgba(136, 204, 255, 0.08); border-color: #88ccff;
+    background: #f0fdf4; border-color: #16a34a;
     transform: translateY(-2px);
   }
   .company-card .cname { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
@@ -116,45 +116,45 @@
   /* ===== 사이드바 ===== */
   .sidebar {
     width: 280px; flex-shrink: 0;
-    background: rgba(0, 0, 0, 0.35);
-    border-right: 1px solid rgba(255,255,255,0.06);
+    background: #ffffff;
+    border-right: 1px solid #f0f0f0;
     display: flex; flex-direction: column;
     overflow: hidden;
   }
   .sb-header {
     padding: 18px 20px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid #f5f5f5;
   }
-  .sb-brand { font-size: 12px; letter-spacing: 4px; color: #88ccff; font-weight: 700; }
+  .sb-brand { font-size: 12px; letter-spacing: 4px; color: #16a34a; font-weight: 700; }
   .sb-company {
     margin-top: 10px;
-    background: rgba(136, 204, 255, 0.1);
+    background: #ecfdf5;
     border: 1px solid rgba(136, 204, 255, 0.25);
     border-radius: 8px;
     padding: 10px 12px;
     display: flex; justify-content: space-between; align-items: center;
   }
-  .sb-company-name { font-size: 14px; font-weight: 700; color: #c9e4f7; }
+  .sb-company-name { font-size: 14px; font-weight: 700; color: #15803d; }
   .sb-company-change {
-    font-size: 11px; color: #88ccff; background: none; border: none;
+    font-size: 11px; color: #16a34a; background: none; border: none;
     padding: 4px 8px; cursor: pointer; width: auto; letter-spacing: 0;
     font-weight: 600;
   }
-  .sb-company-change:hover { background: rgba(136,204,255,0.15); box-shadow: none; }
+  .sb-company-change:hover { background: #d1fae5; box-shadow: none; }
 
   .sb-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
   .sb-nav::-webkit-scrollbar { width: 6px; }
-  .sb-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  .sb-nav::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 3px; }
 
   .sb-group { margin-bottom: 4px; }
   .sb-group-head {
     display: flex; align-items: center; gap: 8px;
     padding: 10px 20px; cursor: pointer;
-    color: #a0b8c8; font-size: 12px; font-weight: 700;
+    color: #6b7280; font-size: 12px; font-weight: 700;
     letter-spacing: 1px; text-transform: uppercase;
     transition: color 0.12s; user-select: none;
   }
-  .sb-group-head:hover { color: #fff; }
+  .sb-group-head:hover { color: #1a1a1a; }
   .sb-group-icon { font-size: 15px; }
   .sb-group-count { margin-left: auto; font-size: 10px; color: #6b8290; }
   .sb-group-chevron {
@@ -169,65 +169,65 @@
   .sb-item {
     display: flex; align-items: center; justify-content: space-between;
     padding: 9px 20px 9px 44px; cursor: pointer;
-    color: #c9d6e0; font-size: 13.5px;
+    color: #4b5563; font-size: 13.5px;
     transition: all 0.12s; border-left: 3px solid transparent;
     user-select: none;
   }
-  .sb-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
+  .sb-item:hover { background: #fafafa; color: #1a1a1a; }
   .sb-item.active {
-    background: rgba(136, 204, 255, 0.1);
-    color: #88ccff; font-weight: 600;
-    border-left-color: #88ccff;
+    background: #ecfdf5;
+    color: #16a34a; font-weight: 600;
+    border-left-color: #16a34a;
   }
   .sb-item-count {
-    font-size: 10px; color: #6b8290; background: rgba(0,0,0,0.3);
+    font-size: 10px; color: #6b8290; background: #ffffff;
     padding: 2px 6px; border-radius: 8px; min-width: 24px; text-align: center;
   }
-  .sb-item.active .sb-item-count { color: #88ccff; background: rgba(136,204,255,0.1); }
+  .sb-item.active .sb-item-count { color: #16a34a; background: rgba(136,204,255,0.1); }
 
-  /* 이중중요성평가 4단계 등급 색상 */
+  /* 이중중요성평가 4단계 등급 색상 - 라이트 톤 */
   .sb-item.grade-essential {
-    color: #ffffff;
+    color: #111827;
     font-weight: 600;
   }
   .sb-item.grade-essential::before {
     content: "★";
-    color: #ff6b6b;
+    color: #dc2626;
     margin-right: 6px;
     font-size: 11px;
   }
   .sb-item.grade-potential {
-    color: #d0dce6;
+    color: #374151;
   }
   .sb-item.grade-potential::before {
     content: "◆";
-    color: #ffa94d;
+    color: #ea580c;
     margin-right: 6px;
     font-size: 10px;
   }
   .sb-item.grade-regular {
-    color: #8b9aa7;
+    color: #6b7280;
   }
   .sb-item.grade-not_applicable {
-    color: #4a5560;
+    color: #9ca3af;
     opacity: 0.55;
   }
   .sb-item.grade-not_applicable::after {
     content: " (N/A)";
-    color: #4a5560;
+    color: #9ca3af;
     font-size: 10px;
     margin-left: 4px;
   }
 
   .sb-footer {
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid #f5f5f5;
     padding: 14px 20px;
     display: flex; flex-direction: column; gap: 10px;
   }
   .sb-user { display: flex; align-items: center; gap: 10px; font-size: 13px; }
   .sb-user-avatar {
     width: 30px; height: 30px; border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+    background: #16a34a;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 13px;
   }
@@ -240,15 +240,15 @@
     padding: 1px 6px; border-radius: 4px; margin-top: 2px;
     display: inline-block; font-weight: 700;
   }
-  .role-staff      { background: rgba(148,163,184,0.2); color: #cbd5e1; }
-  .role-manager    { background: rgba(34,197,94,0.2); color: #86efac; }
-  .role-consultant { background: rgba(251,191,36,0.2); color: #fcd34d; }
+  .role-staff      { background: #f3f4f6; color: #4b5563; }
+  .role-manager    { background: #d1fae5; color: #15803d; }
+  .role-consultant { background: #fef3c7; color: #92400e; }
 
   .sb-logout {
-    background: transparent; border: 1px solid rgba(255,255,255,0.15);
-    color: #a0b8c8; padding: 8px; font-size: 12.5px; width: 100%;
+    background: transparent; border: 1px solid #e5e7eb;
+    color: #6b7280; padding: 8px; font-size: 12.5px; width: 100%;
   }
-  .sb-logout:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; box-shadow: none; }
+  .sb-logout:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #991b1b; box-shadow: none; }
 
   /* ===== 메인 영역 ===== */
   .main {
@@ -260,15 +260,15 @@
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
   .main-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
-  .main-subtitle { font-size: 13px; color: #a0b8c8; }
+  .main-subtitle { font-size: 13px; color: #6b7280; }
   .main-meta {
     display: flex; gap: 10px; flex-wrap: wrap;
   }
   .meta-pill {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #f9fafb;
+    border: 1px solid #f0f0f0;
     padding: 4px 10px; border-radius: 6px;
-    font-size: 11px; color: #a0b8c8; font-weight: 600;
+    font-size: 11px; color: #6b7280; font-weight: 600;
     letter-spacing: 0.5px;
   }
 
@@ -277,34 +277,34 @@
     gap: 14px; margin-bottom: 28px;
   }
   .stat {
-    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
+    background: #ffffff; border: 1px solid #f3f4f6;
     border-radius: 12px; padding: 20px;
   }
-  .stat .n { font-size: 28px; font-weight: 700; color: #88ccff; }
+  .stat .n { font-size: 28px; font-weight: 700; color: #16a34a; }
   .stat .l { font-size: 12px; color: #6b8290; margin-top: 4px; letter-spacing: 1px; }
 
   .placeholder-box {
-    background: rgba(255, 255, 255, 0.04);
+    background: #fafafa;
     border: 1px dashed rgba(255, 255, 255, 0.15);
     border-radius: 16px; padding: 60px 40px;
     text-align: center; margin-top: 16px;
   }
   .placeholder-box h2 { margin-bottom: 12px; }
-  .placeholder-box p { color: #a0b8c8; line-height: 1.6; font-size: 14px; }
+  .placeholder-box p { color: #6b7280; line-height: 1.6; font-size: 14px; }
 
   .welcome-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 14px; margin-top: 20px;
   }
   .welcome-card {
-    background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08);
+    background: #f9fafb; border: 1px solid #f3f4f6;
     border-radius: 12px; padding: 22px 22px;
   }
   .welcome-card h3 {
-    font-size: 15px; font-weight: 700; margin-bottom: 10px; color: #88ccff;
+    font-size: 15px; font-weight: 700; margin-bottom: 10px; color: #16a34a;
   }
   .welcome-card p {
-    font-size: 13px; color: #a0b8c8; line-height: 1.6;
+    font-size: 13px; color: #6b7280; line-height: 1.6;
   }
 
   .loading-dot {
@@ -318,8 +318,8 @@
   .edit-toolbar {
     display: flex; gap: 20px; align-items: center;
     margin-bottom: 24px; padding: 14px 16px;
-    background: rgba(0,0,0,0.3); border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.06);
+    background: #ffffff; border-radius: 10px;
+    border: 1px solid #f8f8f8;
     position: sticky; top: 0; z-index: 5;
     flex-wrap: wrap;
   }
@@ -331,17 +331,17 @@
   .tabgroup { display: flex; gap: 4px; flex-wrap: wrap; }
   .tab {
     padding: 6px 14px; border-radius: 7px; cursor: pointer;
-    font-size: 13px; color: #a0b8c8;
+    font-size: 13px; color: #6b7280;
     border: 1px solid transparent; background: transparent;
     width: auto; font-weight: 500; box-shadow: none;
     transition: all 0.12s;
   }
   .tab:hover {
-    background: rgba(255,255,255,0.04); color: #fff; box-shadow: none;
+    background: #fafafa; color: #1a1a1a; box-shadow: none;
     transform: none;
   }
   .tab.active {
-    background: rgba(136,204,255,0.12); color: #88ccff;
+    background: rgba(136,204,255,0.12); color: #16a34a;
     border-color: rgba(136,204,255,0.3); font-weight: 700;
   }
 
@@ -364,7 +364,7 @@
     grid-template-columns: minmax(240px, 1fr) 2fr;
     gap: 28px;
     padding: 20px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid #f5f5f5;
     align-items: start;
   }
   .field-row:last-child { border-bottom: none; }
@@ -397,31 +397,31 @@
   }
   .field-input { flex: 1; min-width: 0; }
   .field-unit {
-    font-size: 12px; color: #a0b8c8; padding: 6px 10px;
-    background: rgba(0,0,0,0.3); border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 12px; color: #6b7280; padding: 6px 10px;
+    background: #ffffff; border-radius: 6px;
+    border: 1px solid #f8f8f8;
     white-space: nowrap; font-weight: 600; flex-shrink: 0;
   }
 
   textarea {
     width: 100%; min-height: 80px; resize: vertical;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px;
-    padding: 11px 14px; color: #fff; font-size: 14px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb; border-radius: 10px;
+    padding: 11px 14px; color: #1a1a1a; font-size: 14px;
     font-family: inherit; line-height: 1.55;
     transition: border 0.15s;
   }
-  textarea:focus { outline: none; border-color: #88ccff; }
+  textarea:focus { outline: none; border-color: #16a34a; }
   select {
     width: 100%;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px;
-    padding: 11px 14px; color: #fff; font-size: 14px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb; border-radius: 10px;
+    padding: 11px 14px; color: #1a1a1a; font-size: 14px;
     font-family: inherit; cursor: pointer; appearance: none;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%2388ccff%22%20d%3D%22M5%208l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
   }
-  select:focus { outline: none; border-color: #88ccff; }
+  select:focus { outline: none; border-color: #16a34a; }
   input[type=number] {
     font-family: "SF Mono", "Consolas", monospace; letter-spacing: 0.3px;
   }
@@ -442,13 +442,13 @@
   .multi-chip {
     padding: 6px 12px; border-radius: 6px; cursor: pointer;
     font-size: 12.5px; font-weight: 500; user-select: none;
-    background: rgba(0,0,0,0.25); color: #a0b8c8;
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #f9fafb; color: #6b7280;
+    border: 1px solid #f0f0f0;
     transition: all 0.12s;
   }
-  .multi-chip:hover { background: rgba(255,255,255,0.04); color: #fff; }
+  .multi-chip:hover { background: #fafafa; color: #1a1a1a; }
   .multi-chip.on {
-    background: rgba(136,204,255,0.12); color: #88ccff;
+    background: rgba(136,204,255,0.12); color: #16a34a;
     border-color: rgba(136,204,255,0.3); font-weight: 700;
   }
 
@@ -488,7 +488,7 @@
   .mat-tab:hover { background: #f3f4f6; color: #111827; }
   .mat-tab.active {
     background: #111827;
-    color: #fff;
+    color: #1a1a1a;
     font-weight: 600;
   }
   .mat-saving {
@@ -505,7 +505,7 @@
   /* ===== v1.0: 카드형 위자드 ===== */
   .mode-toggle {
     display: inline-flex;
-    background: rgba(255,255,255,0.06);
+    background: #f3f4f6;
     border-radius: 10px;
     padding: 3px;
     gap: 2px;
@@ -514,7 +514,7 @@
   .mode-toggle button {
     background: transparent;
     border: none;
-    color: rgba(255,255,255,0.6);
+    color: rgba(0,0,0,0.5);
     padding: 6px 14px;
     font-size: 12px;
     font-weight: 600;
@@ -524,7 +524,7 @@
   }
   .mode-toggle button.active {
     background: rgba(136,204,255,0.2);
-    color: #88ccff;
+    color: #16a34a;
   }
   .excel-upload {
     display: inline-flex;
@@ -544,8 +544,8 @@
   .excel-upload input { display: none; }
 
   .card-wizard {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: #fafafa;
+    border: 1px solid #f3f4f6;
     border-radius: 18px;
     padding: 0;
     margin-bottom: 20px;
@@ -553,7 +553,7 @@
   }
   .card-wizard-progress {
     padding: 18px 28px;
-    background: rgba(255,255,255,0.03);
+    background: #fafafa;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
     align-items: center;
@@ -561,7 +561,7 @@
   }
   .card-wizard-progress-text {
     font-size: 12px;
-    color: rgba(255,255,255,0.7);
+    color: rgba(0,0,0,0.6);
     font-weight: 600;
     white-space: nowrap;
     font-feature-settings: 'tnum';
@@ -569,7 +569,7 @@
   .card-wizard-progress-bar {
     flex: 1;
     height: 6px;
-    background: rgba(255,255,255,0.08);
+    background: #ffffff;
     border-radius: 3px;
     overflow: hidden;
   }
@@ -589,13 +589,13 @@
     gap: 10px;
     font-size: 22px;
     font-weight: 700;
-    color: #fff;
+    color: #1a1a1a;
     line-height: 1.3;
     margin-bottom: 8px;
   }
   .card-wizard-desc {
     font-size: 14px;
-    color: rgba(255,255,255,0.65);
+    color: rgba(0,0,0,0.55);
     line-height: 1.6;
     margin-bottom: 12px;
   }
@@ -603,9 +603,9 @@
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: rgba(136,204,255,0.15);
+    background: #d1fae5;
     border: 1px solid rgba(136,204,255,0.3);
-    color: #88ccff;
+    color: #16a34a;
     font-size: 12px;
     font-weight: 700;
     cursor: help;
@@ -635,7 +635,7 @@
   }
   .help-tooltip-title {
     font-weight: 700;
-    color: #88ccff;
+    color: #16a34a;
     margin-bottom: 6px;
     font-size: 12px;
   }
@@ -647,8 +647,8 @@
     font-size: 11px;
   }
   .card-context-pill {
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.7);
+    background: #f3f4f6;
+    color: rgba(0,0,0,0.6);
     padding: 3px 10px;
     border-radius: 12px;
   }
@@ -659,8 +659,8 @@
     border-radius: 12px;
   }
   .quick-picks {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: #fafafa;
+    border: 1px solid #f8f8f8;
     border-radius: 12px;
     padding: 16px 18px;
     margin-bottom: 16px;
@@ -680,9 +680,9 @@
     gap: 8px;
   }
   .pick-chip {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.85);
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    color: rgba(0,0,0,0.78);
     padding: 8px 14px;
     border-radius: 10px;
     font-size: 13px;
@@ -695,17 +695,17 @@
     font-weight: 500;
   }
   .pick-chip:hover {
-    background: rgba(255,255,255,0.1);
+    background: #e5e7eb;
     border-color: rgba(136,204,255,0.3);
   }
   .pick-chip.active {
-    background: rgba(136,204,255,0.15);
-    border-color: #88ccff;
-    color: #fff;
+    background: #d1fae5;
+    border-color: #16a34a;
+    color: #1a1a1a;
   }
   .pick-chip.active::before {
     content: '✓';
-    color: #88ccff;
+    color: #16a34a;
     font-weight: 700;
   }
   .rec-badge {
@@ -719,11 +719,11 @@
   }
   .card-text-input {
     width: 100%;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #f9fafb;
+    border: 1px solid #f0f0f0;
     border-radius: 10px;
     padding: 14px 16px;
-    color: #fff;
+    color: #1a1a1a;
     font-size: 14px;
     font-family: inherit;
     line-height: 1.6;
@@ -736,7 +736,7 @@
   }
   .card-wizard-nav {
     padding: 20px 28px;
-    background: rgba(255,255,255,0.03);
+    background: #fafafa;
     border-top: 1px solid rgba(255,255,255,0.06);
     display: flex;
     justify-content: space-between;
@@ -752,20 +752,20 @@
     transition: all 0.15s;
   }
   .card-wizard-nav .btn-prev {
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.8);
+    background: #f3f4f6;
+    color: rgba(0,0,0,0.72);
     border-color: rgba(255,255,255,0.08);
   }
-  .card-wizard-nav .btn-prev:hover { background: rgba(255,255,255,0.1); }
+  .card-wizard-nav .btn-prev:hover { background: #e5e7eb; }
   .card-wizard-nav .btn-prev:disabled { opacity: 0.3; cursor: not-allowed; }
   .card-wizard-nav .btn-skip {
     background: transparent;
-    color: rgba(255,255,255,0.5);
+    color: rgba(0,0,0,0.4);
   }
-  .card-wizard-nav .btn-skip:hover { color: rgba(255,255,255,0.8); }
+  .card-wizard-nav .btn-skip:hover { color: rgba(0,0,0,0.72); }
   .card-wizard-nav .btn-next {
     background: #10b981;
-    color: #fff;
+    color: #1a1a1a;
     margin-left: auto;
   }
   .card-wizard-nav .btn-next:hover { background: #059669; }
@@ -779,7 +779,7 @@
     margin-bottom: 12px;
   }
   .card-wizard-complete p {
-    color: rgba(255,255,255,0.65);
+    color: rgba(0,0,0,0.55);
     margin-bottom: 24px;
   }
   .card-wizard-complete button {
@@ -795,11 +795,11 @@
   /* 숫자/불린/셀렉트용 카드 입력 */
   .card-number-input {
     width: 100%;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #f9fafb;
+    border: 1px solid #f0f0f0;
     border-radius: 10px;
     padding: 16px 20px;
-    color: #fff;
+    color: #1a1a1a;
     font-size: 22px;
     font-weight: 600;
     font-family: inherit;
@@ -817,7 +817,7 @@
   }
   .card-number-unit {
     font-size: 15px;
-    color: rgba(255,255,255,0.7);
+    color: rgba(0,0,0,0.6);
     font-weight: 600;
     white-space: nowrap;
   }
@@ -828,16 +828,16 @@
   .card-boolean-btn {
     flex: 1;
     padding: 18px;
-    background: rgba(255,255,255,0.05);
+    background: #f9fafb;
     border: 2px solid rgba(255,255,255,0.1);
     border-radius: 12px;
-    color: rgba(255,255,255,0.8);
+    color: rgba(0,0,0,0.72);
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .card-boolean-btn:hover { background: rgba(255,255,255,0.08); }
+  .card-boolean-btn:hover { background: #ffffff; }
   .card-boolean-btn.active.yes {
     background: rgba(16,185,129,0.15);
     border-color: #10b981;
@@ -846,7 +846,7 @@
   .card-boolean-btn.active.no {
     background: rgba(239,68,68,0.15);
     border-color: #ef4444;
-    color: #fca5a5;
+    color: #991b1b;
   }
   .card-select-group {
     display: flex;
@@ -855,25 +855,25 @@
   }
   .card-select-option {
     padding: 14px 18px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: #f9fafb;
+    border: 1px solid #f0f0f0;
     border-radius: 10px;
-    color: rgba(255,255,255,0.85);
+    color: rgba(0,0,0,0.78);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.15s;
     text-align: left;
   }
-  .card-select-option:hover { background: rgba(255,255,255,0.08); }
+  .card-select-option:hover { background: #ffffff; }
   .card-select-option.active {
-    background: rgba(136,204,255,0.15);
-    border-color: #88ccff;
-    color: #fff;
+    background: #d1fae5;
+    border-color: #16a34a;
+    color: #1a1a1a;
     font-weight: 600;
   }
   .auto-summary-block {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: #fafafa;
+    border: 1px solid #f3f4f6;
     border-radius: 14px;
     padding: 20px 24px;
     margin-bottom: 20px;
@@ -889,17 +889,17 @@
   .auto-summary-title {
     font-size: 14px;
     font-weight: 700;
-    color: #fff;
+    color: #1a1a1a;
     letter-spacing: 0.02em;
   }
   .auto-summary-sub {
     font-size: 12px;
-    color: rgba(255,255,255,0.5);
+    color: rgba(0,0,0,0.4);
     margin-top: 4px;
   }
   .auto-summary-copy {
-    background: rgba(136, 204, 255, 0.15);
-    color: #88ccff;
+    background: #d1fae5;
+    color: #16a34a;
     border: 1px solid rgba(136, 204, 255, 0.3);
     padding: 8px 14px;
     border-radius: 8px;
@@ -918,24 +918,24 @@
     font-size: 13px;
   }
   .auto-summary-table th {
-    background: rgba(255,255,255,0.06);
+    background: #f3f4f6;
     padding: 10px 14px;
     text-align: left;
-    color: rgba(255,255,255,0.8);
+    color: rgba(0,0,0,0.72);
     font-weight: 600;
     font-size: 12px;
     letter-spacing: 0.02em;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid #f3f4f6;
   }
   .auto-summary-table th.latest { color: #10b981; }
   .auto-summary-table td {
     padding: 10px 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: rgba(255,255,255,0.85);
+    border-bottom: 1px solid #f8f8f8;
+    color: rgba(0,0,0,0.78);
   }
   .auto-summary-table .row-label { font-weight: 500; }
   .auto-summary-table .row-unit {
-    color: rgba(255,255,255,0.5);
+    color: rgba(0,0,0,0.4);
     font-size: 11px;
   }
   .auto-summary-table .row-num {
@@ -957,25 +957,25 @@
   .auto-summary-empty {
     padding: 24px;
     text-align: center;
-    color: rgba(255,255,255,0.5);
+    color: rgba(0,0,0,0.4);
     font-size: 13px;
-    background: rgba(255,255,255,0.02);
+    background: #fcfcfc;
     border-radius: 8px;
   }
   .auto-summary-missing {
     margin-top: 12px;
     padding: 10px 14px;
-    background: rgba(245,158,11,0.08);
-    border: 1px solid rgba(245,158,11,0.2);
+    background: #fef3c7;
+    border: 1px solid #fde68a;
     border-radius: 8px;
     font-size: 11px;
-    color: rgba(245,158,11,0.9);
+    color: #92400e;
   }
   .auto-summary-report {
     margin-top: 20px;
     padding: 16px 18px;
-    background: rgba(139, 92, 246, 0.08);
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    background: #ede9fe;
+    border: 1px solid #ddd6fe;
     border-radius: 10px;
   }
   .auto-summary-report h4 {
@@ -989,7 +989,7 @@
   .auto-summary-report-item {
     margin-bottom: 14px;
     padding-bottom: 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid #f5f5f5;
   }
   .auto-summary-report-item:last-child {
     margin-bottom: 0;
@@ -998,13 +998,13 @@
   }
   .auto-summary-report-label {
     font-size: 12px;
-    color: rgba(255,255,255,0.7);
+    color: rgba(0,0,0,0.6);
     font-weight: 600;
     margin-bottom: 6px;
   }
   .auto-summary-report-text {
     font-size: 13px;
-    color: rgba(255,255,255,0.85);
+    color: rgba(0,0,0,0.78);
     line-height: 1.6;
     white-space: pre-wrap;
   }
@@ -1251,7 +1251,7 @@ function Sidebar({ profile, company, categories, selectedId, onSelect, onChangeC
           <button
             className={"sb-item" + (selectedId === '__ai_description__' ? " active" : "")}
             onClick={() => onSelect({ id: '__ai_description__', name: 'AI 설명 재생성', code: '__ai_description__' })}
-            style={{ marginBottom: 8, fontWeight: 600, background: selectedId === '__ai_description__' ? undefined : "rgba(139, 92, 246, 0.08)", color: selectedId === '__ai_description__' ? undefined : "#c4b5fd", border: "1px solid rgba(139, 92, 246, 0.2)" }}
+            style={{ marginBottom: 8, fontWeight: 600, background: selectedId === '__ai_description__' ? undefined : "#ede9fe", color: selectedId === '__ai_description__' ? undefined : "#c4b5fd", border: "1px solid #ddd6fe" }}
           >
             🤖 AI 설명 재생성
           </button>
@@ -1416,7 +1416,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
   // ===== 3년 추세 SVG =====
   const renderScopeTrendSVG = () => {
     const years = [2023, 2024, 2025];
-    const COL = { s1: "#15803d", s2: "#4ade80", s3: "#86efac" };
+    const COL = { s1: "#166534", s2: "#0891b2", s3: "#7c3aed" };
     const allVals = years.flatMap(y => [scopeByYear[y].s1, scopeByYear[y].s2, scopeByYear[y].s3]);
     const maxVal = Math.max(...allVals, 1);
     const niceMax = Math.ceil(maxVal * 1.15 / 10) * 10 || 10;
@@ -1436,13 +1436,13 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
           const val = niceMax * (1 - i / 5);
           return (
             <g key={`grid-${i}`}>
-              <line x1={M.left} y1={y} x2={M.left + PW} y2={y} stroke="rgba(255,255,255,0.08)" strokeDasharray="2 4" />
-              <text x={M.left - 8} y={y + 4} textAnchor="end" fontSize="10" fill="rgba(255,255,255,0.5)">{val.toFixed(0)}</text>
+              <line x1={M.left} y1={y} x2={M.left + PW} y2={y} stroke="rgba(0,0,0,0.06)" strokeDasharray="2 4" />
+              <text x={M.left - 8} y={y + 4} textAnchor="end" fontSize="10" fill="rgba(0,0,0,0.4)">{val.toFixed(0)}</text>
             </g>
           );
         })}
-        <line x1={M.left} y1={M.top + PH} x2={M.left + PW} y2={M.top + PH} stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
-        <text x={M.left - 44} y={M.top + PH / 2} fontSize="10" fill="rgba(255,255,255,0.5)"
+        <line x1={M.left} y1={M.top + PH} x2={M.left + PW} y2={M.top + PH} stroke="rgba(0,0,0,0.2)" strokeWidth="1.5" />
+        <text x={M.left - 44} y={M.top + PH / 2} fontSize="10" fill="rgba(0,0,0,0.4)"
           transform={`rotate(-90, ${M.left - 44}, ${M.top + PH / 2})`} textAnchor="middle">tCO₂eq</text>
 
         {/* 그룹 막대 */}
@@ -1474,7 +1474,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
                   </g>
                 );
               })}
-              <text x={gx} y={M.top + PH + 20} textAnchor="middle" fontSize="12" fontWeight="600" fill="rgba(255,255,255,0.85)">{year}년</text>
+              <text x={gx} y={M.top + PH + 20} textAnchor="middle" fontSize="12" fontWeight="600" fill="rgba(0,0,0,0.78)">{year}년</text>
             </g>
           );
         })}
@@ -1488,13 +1488,13 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
           ].map((it, i) => (
             <g key={i} transform={`translate(${i * 140}, 0)`}>
               <rect width="11" height="11" rx="2" fill={it.c} />
-              <text x="16" y="10" fontSize="11" fill="rgba(255,255,255,0.85)">{it.lbl}</text>
+              <text x="16" y="10" fontSize="11" fill="rgba(0,0,0,0.78)">{it.lbl}</text>
             </g>
           ))}
         </g>
 
         {!hasData && (
-          <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="14" fill="rgba(255,255,255,0.4)">
+          <text x={W / 2} y={H / 2} textAnchor="middle" fontSize="14" fill="rgba(0,0,0,0.3)">
             GRI 102-5·102-6·102-7 (기후변화 2025) 연계 필드 입력 시 자동 표시됩니다
           </text>
         )}
@@ -1528,22 +1528,22 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
 
       {/* KPI 4개 */}
       <div className="stats-grid">
-        <div className="stat" style={{ background: "rgba(22, 163, 74, 0.08)", border: "1px solid rgba(22, 163, 74, 0.2)" }}>
-          <div className="n">{stats.filled}<span style={{ fontSize: 18, color: "rgba(255,255,255,0.5)" }}> / {stats.totalFields}</span></div>
-          <div className="l" style={{ color: "#4ade80" }}>입력 완료 필드</div>
+        <div className="stat" style={{ background: "#f0fdf4", border: "1px solid #d1fae5" }}>
+          <div className="n">{stats.filled}<span style={{ fontSize: 18, color: "#9ca3af" }}> / {stats.totalFields}</span></div>
+          <div className="l" style={{ color: "#16a34a" }}>입력 완료 필드</div>
         </div>
         <div className="stat">
-          <div className="n" style={{ color: stats.overallPct >= 80 ? "#15803d" : stats.overallPct >= 40 ? "#4ade80" : "#fff" }}>
-            {stats.overallPct.toFixed(1)}<span style={{ fontSize: 18, color: "#4ade80" }}>%</span>
+          <div className="n" style={{ color: stats.overallPct >= 80 ? "#15803d" : stats.overallPct >= 40 ? "#16a34a" : "#111827" }}>
+            {stats.overallPct.toFixed(1)}<span style={{ fontSize: 18, color: "#16a34a" }}>%</span>
           </div>
           <div className="l">전체 입력 진행률</div>
         </div>
         <div className="stat">
-          <div className="n">{matSummary.assessedCount}<span style={{ fontSize: 18, color: "rgba(255,255,255,0.5)" }}> / 15</span></div>
+          <div className="n">{matSummary.assessedCount}<span style={{ fontSize: 18, color: "#9ca3af" }}> / 15</span></div>
           <div className="l">이중중대성 평가</div>
         </div>
         <div className="stat">
-          <div className="n" style={{ color: matSummary.confirmed ? "#15803d" : "#fff" }}>
+          <div className="n" style={{ color: matSummary.confirmed ? "#15803d" : "#111827" }}>
             {matSummary.confirmed ? `${matSummary.coreCount}` : "—"}
           </div>
           <div className="l">{matSummary.confirmed ? "핵심 이슈 확정" : "아직 미확정"}</div>
@@ -1585,14 +1585,14 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {stats.catProgress.map(c => {
-              const color = c.pct >= 85 ? "#15803d" : c.pct >= 70 ? "#16a34a" : c.pct >= 50 ? "#4ade80" : c.pct >= 25 ? "#86efac" : c.pct > 0 ? "#bbf7d0" : "#374151";
+              const color = c.pct >= 85 ? "#15803d" : c.pct >= 70 ? "#16a34a" : c.pct >= 50 ? "#4ade80" : c.pct >= 25 ? "#86efac" : c.pct > 0 ? "#bbf7d0" : "#e5e7eb";
               return (
                 <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ flex: "0 0 200px", fontSize: 13, color: "rgba(255,255,255,0.85)" }}>{c.name}</div>
-                  <div style={{ flex: 1, height: 8, background: "rgba(255,255,255,0.08)", borderRadius: 4, overflow: "hidden" }}>
+                  <div style={{ flex: "0 0 200px", fontSize: 13, color: "#1f2937" }}>{c.name}</div>
+                  <div style={{ flex: 1, height: 8, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
                     <div style={{ width: `${c.pct}%`, height: "100%", background: color, transition: "width 0.4s" }} />
                   </div>
-                  <div style={{ flex: "0 0 110px", textAlign: "right", fontSize: 12, color: "rgba(255,255,255,0.7)", fontFeatureSettings: "'tnum'" }}>
+                  <div style={{ flex: "0 0 110px", textAlign: "right", fontSize: 12, color: "#4b5563", fontFeatureSettings: "'tnum'" }}>
                     {c.filled} / {c.total} · <strong style={{ color }}>{c.pct.toFixed(0)}%</strong>
                   </div>
                 </div>
@@ -2046,16 +2046,16 @@ function CategoryEditPane({ category, company, supabase, profile }) {
         if (askFields.length === 0) return null;
         return (
           <div style={{
-            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.04))",
-            border: "1px solid rgba(59, 130, 246, 0.25)",
+            background: "#f0fdf4",
+            border: "1px solid #d1fae5",
             borderRadius: 12,
             padding: 24,
             marginBottom: 20,
           }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#88ccff", marginBottom: 8 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#15803d", marginBottom: 8 }}>
               📋 귀사 해당 항목 체크
             </div>
-            <div style={{ fontSize: 13, color: "#a0b0bd", marginBottom: 18, lineHeight: 1.5 }}>
+            <div style={{ fontSize: 13, color: "#4b5563", marginBottom: 18, lineHeight: 1.5 }}>
               본 메뉴에 일부 항목은 회사 상황에 따라 해당 여부가 다릅니다. 해당하는 항목만 체크해주세요. 
               체크 안 한 항목은 입력 화면에서 자동 숨김 처리되고, 보고서에 "해당없음"으로 표시됩니다.
             </div>
@@ -2066,8 +2066,8 @@ function CategoryEditPane({ category, company, supabase, profile }) {
                   alignItems: "flex-start",
                   gap: 12,
                   padding: 14,
-                  background: applicabilityMap[f.id] === true ? "rgba(74, 222, 128, 0.08)" : "rgba(255, 255, 255, 0.02)",
-                  border: `1px solid ${applicabilityMap[f.id] === true ? "rgba(74, 222, 128, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
+                  background: applicabilityMap[f.id] === true ? "#d1fae5" : "#ffffff",
+                  border: `1px solid ${applicabilityMap[f.id] === true ? "#86efac" : "#e5e7eb"}`,
                   borderRadius: 8,
                   cursor: "pointer",
                   transition: "all 0.15s",
@@ -2081,15 +2081,15 @@ function CategoryEditPane({ category, company, supabase, profile }) {
                     style={{ marginTop: 3, width: 18, height: 18, cursor: "pointer" }}
                   />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "#e0e8ee", marginBottom: 4 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#111827", marginBottom: 4 }}>
                       {f.label}
                       {f.gri_disclosures && f.gri_disclosures.length > 0 && (
                         <span style={{ 
                           marginLeft: 8, 
                           fontSize: 10, 
                           padding: "2px 6px", 
-                          background: "rgba(74, 222, 128, 0.15)",
-                          color: "#4ade80",
+                          background: "#d1fae5",
+                          color: "#15803d",
                           borderRadius: 4,
                           fontWeight: 500,
                         }}>
@@ -2098,12 +2098,12 @@ function CategoryEditPane({ category, company, supabase, profile }) {
                       )}
                     </div>
                     {f.applicability_note && (
-                      <div style={{ fontSize: 12, color: "#8b9aa7", lineHeight: 1.5 }}>
+                      <div style={{ fontSize: 12, color: "#6b7280", lineHeight: 1.5 }}>
                         💡 {f.applicability_note}
                       </div>
                     )}
                     {f.applicability_default === 'not_applicable' && (
-                      <div style={{ fontSize: 11, color: "#ffa94d", marginTop: 4 }}>
+                      <div style={{ fontSize: 11, color: "#92400e", marginTop: 4 }}>
                         ⚠️ 일반적으로 국내 협력사는 해당없음
                       </div>
                     )}
@@ -2114,16 +2114,15 @@ function CategoryEditPane({ category, company, supabase, profile }) {
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 18, gap: 10 }}>
               <button
                 onClick={() => {
-                  // 모두 해당없음으로 설정
                   const m = {};
                   askFields.forEach(f => m[f.id] = false);
                   setApplicabilityMap(m);
                 }}
                 style={{
                   padding: "10px 18px",
-                  background: "transparent",
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
-                  color: "#a0b0bd",
+                  background: "#ffffff",
+                  border: "1px solid #e5e7eb",
+                  color: "#6b7280",
                   borderRadius: 6,
                   cursor: "pointer",
                   fontSize: 13,
@@ -2135,7 +2134,7 @@ function CategoryEditPane({ category, company, supabase, profile }) {
                 onClick={saveApplicability}
                 style={{
                   padding: "10px 24px",
-                  background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                  background: "#16a34a",
                   border: "none",
                   color: "#fff",
                   borderRadius: 6,
@@ -2158,8 +2157,8 @@ function CategoryEditPane({ category, company, supabase, profile }) {
             style={{
               padding: "6px 12px",
               background: "transparent",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              color: "#8b9aa7",
+              border: "1px solid #e5e7eb",
+              color: "#6b7280",
               borderRadius: 4,
               cursor: "pointer",
               fontSize: 11,
@@ -3621,7 +3620,7 @@ ${field.unit ? `- 단위: ${field.unit}` : ""}
         </div>
       </div>
 
-      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: 20, marginBottom: 16 }}>
+      <div style={{ background: "#fafafa", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: 20, marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: "#88ccff", marginBottom: 12 }}>
           📋 대상 카테고리 선택
         </div>
@@ -3651,7 +3650,7 @@ ${field.unit ? `- 단위: ${field.unit}` : ""}
           </button>
           <button disabled={generating || filteredFields.length === 0}
             onClick={() => runGeneration(filteredFields)}
-            style={{ background: "rgba(245,158,11,0.2)", color: "#fbbf24", padding: "10px 18px", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 10, fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
+            style={{ background: "#fde68a", color: "#fbbf24", padding: "10px 18px", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 10, fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
             ♻️ 전체 {filteredFields.length}개 재생성 (덮어쓰기)
           </button>
         </div>
@@ -3662,7 +3661,7 @@ ${field.unit ? `- 단위: ${field.unit}` : ""}
           <div style={{ fontSize: 13, fontWeight: 600, color: "#34d399", marginBottom: 8 }}>
             🤖 생성 중... {progress.done}/{progress.total}
           </div>
-          <div style={{ height: 6, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden", marginBottom: 8 }}>
+          <div style={{ height: 6, background: "#f9fafb", borderRadius: 3, overflow: "hidden", marginBottom: 8 }}>
             <div style={{ width: `${progress.total > 0 ? progress.done/progress.total*100 : 0}%`, height: "100%", background: "#10b981", transition: "width 0.3s" }} />
           </div>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)" }}>현재: {progress.current}</div>
@@ -3691,7 +3690,7 @@ ${field.unit ? `- 단위: ${field.unit}` : ""}
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, alignItems: "flex-start" }}>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>{r.field.label}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
+                    <div style={{ fontSize: 11, color: "rgba(0,0,0,0.4)" }}>
                       {r.field.field_code} · {r.field.input_type}
                     </div>
                   </div>
@@ -3882,7 +3881,7 @@ function CardFieldRenderer({ field, value, onChange }) {
       : (field.options && field.options.items) ? field.options.items : [];
     return (
       <div className="card-select-group">
-        {opts.length === 0 && <div style={{ color: "rgba(255,255,255,0.5)" }}>선택지가 정의되지 않았습니다.</div>}
+        {opts.length === 0 && <div style={{ color: "rgba(0,0,0,0.4)" }}>선택지가 정의되지 않았습니다.</div>}
         {opts.map((o, i) => {
           const optVal = typeof o === "string" ? o : (o.value ?? o.label);
           const optLbl = typeof o === "string" ? o : (o.label ?? o.value);
@@ -3971,7 +3970,7 @@ function CategoryCardWizard({ fields, currentSite, currentYear, getValue, setFie
             <p style={{ color: "#fbbf24" }}>⚠️ 저장되지 않은 변경사항 {dirtyCount}개 · 저장 버튼을 눌러주세요</p>
           )}
           <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 16 }}>
-            <button onClick={() => setCardIndex(0)} style={{ background: "rgba(255,255,255,0.08)", color: "#fff" }}>
+            <button onClick={() => setCardIndex(0)} style={{ background: "#f9fafb", color: "#fff" }}>
               ↺ 처음부터 다시
             </button>
             {dirtyCount > 0 && (
@@ -4004,7 +4003,7 @@ function CategoryCardWizard({ fields, currentSite, currentYear, getValue, setFie
         <div className="card-wizard-progress-bar">
           <div className="card-wizard-progress-fill" style={{ width: `${pct}%` }} />
         </div>
-        <div className="card-wizard-progress-text" style={{ color: "rgba(255,255,255,0.5)" }}>
+        <div className="card-wizard-progress-text" style={{ color: "rgba(0,0,0,0.4)" }}>
           {pct.toFixed(0)}%
         </div>
       </div>
@@ -4161,12 +4160,12 @@ function AutoBarChart({ rows }) {
         const y = M.top + PH * (1 - r);
         return (
           <g key={r}>
-            <line x1={M.left} y1={y} x2={M.left + PW} y2={y} stroke="rgba(255,255,255,0.08)" strokeDasharray="2 4" />
-            <text x={M.left - 8} y={y + 4} textAnchor="end" fontSize="10" fill="rgba(255,255,255,0.5)">{formatAutoNum(niceMax * r)}</text>
+            <line x1={M.left} y1={y} x2={M.left + PW} y2={y} stroke="rgba(0,0,0,0.06)" strokeDasharray="2 4" />
+            <text x={M.left - 8} y={y + 4} textAnchor="end" fontSize="10" fill="rgba(0,0,0,0.4)">{formatAutoNum(niceMax * r)}</text>
           </g>
         );
       })}
-      <line x1={M.left} y1={M.top + PH} x2={M.left + PW} y2={M.top + PH} stroke="rgba(255,255,255,0.3)" />
+      <line x1={M.left} y1={M.top + PH} x2={M.left + PW} y2={M.top + PH} stroke="rgba(0,0,0,0.2)" />
       {top.map((r, i) => {
         const gx = M.left + groupW * i + groupW / 2;
         const items = [
@@ -4194,7 +4193,7 @@ function AutoBarChart({ rows }) {
               );
             })}
             <text x={gx} y={M.top + PH + 18} textAnchor="middle" fontSize="10" fill="rgba(255,255,255,0.75)">{lbl}</text>
-            {r.field.unit && <text x={gx} y={M.top + PH + 32} textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.4)">({r.field.unit})</text>}
+            {r.field.unit && <text x={gx} y={M.top + PH + 32} textAnchor="middle" fontSize="9" fill="rgba(0,0,0,0.3)">({r.field.unit})</text>}
           </g>
         );
       })}
