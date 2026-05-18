@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The 4th Edge · ESG 플랫폼 v1.3</title>
+<title>The 4th Edge · ESG 플랫폼 v1.1</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -184,6 +184,40 @@
     padding: 2px 6px; border-radius: 8px; min-width: 24px; text-align: center;
   }
   .sb-item.active .sb-item-count { color: #88ccff; background: rgba(136,204,255,0.1); }
+
+  /* 이중중요성평가 4단계 등급 색상 */
+  .sb-item.grade-essential {
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .sb-item.grade-essential::before {
+    content: "★";
+    color: #ff6b6b;
+    margin-right: 6px;
+    font-size: 11px;
+  }
+  .sb-item.grade-potential {
+    color: #d0dce6;
+  }
+  .sb-item.grade-potential::before {
+    content: "◆";
+    color: #ffa94d;
+    margin-right: 6px;
+    font-size: 10px;
+  }
+  .sb-item.grade-regular {
+    color: #8b9aa7;
+  }
+  .sb-item.grade-not_applicable {
+    color: #4a5560;
+    opacity: 0.55;
+  }
+  .sb-item.grade-not_applicable::after {
+    content: " (N/A)";
+    color: #4a5560;
+    font-size: 10px;
+    margin-left: 4px;
+  }
 
   .sb-footer {
     border-top: 1px solid rgba(255,255,255,0.05);
@@ -1026,7 +1060,9 @@ function useSupabase() {
   const [sb, setSb] = useState(null);
   useEffect(() => {
     import("https://esm.sh/@supabase/supabase-js@2").then(m => {
-      setSb(m.createClient(SUPABASE_URL, SUPABASE_KEY));
+      const client = m.createClient(SUPABASE_URL, SUPABASE_KEY);
+      window.__sb_client = client;
+      setSb(client);
     });
   }, []);
   return sb;
@@ -1065,7 +1101,7 @@ function LoginView({ supabase }) {
           </div>
           <button type="submit" disabled={busy}>{busy ? "로그인 중…" : "로그인"}</button>
         </form>
-        <div className="muted">v1.3 · 실시간 대시보드</div>
+        <div className="muted">v1.1 · 실시간 대시보드</div>
       </div>
     </div>
   );
@@ -1104,6 +1140,58 @@ function CompanyPickerView({ profile, companies, onPick, onLogout }) {
 
 // ==================== 사이드바 ====================
 function Sidebar({ profile, company, categories, selectedId, onSelect, onChangeCompany, onLogout }) {
+  // 이중중요성평가 등급 로드 (회사별)
+  const [topicGrades, setTopicGrades] = useState({});
+  const supabase = window.__sb_client;
+  
+  useEffect(() => {
+    if (!supabase || !company?.id) return;
+    let alive = true;
+    (async () => {
+      // 가장 최근 연도 등급 가져오기
+      const { data, error } = await supabase
+        .from("materiality_topic_grades")
+        .select("topic_code, grade, gri_standards, year")
+        .eq("company_id", company.id)
+        .order("year", { ascending: false });
+      if (!alive || error || !data) return;
+      // 가장 최근 연도만 사용
+      const latestYear = data[0]?.year;
+      const latest = data.filter(d => d.year === latestYear);
+      // GRI standard → grade 매핑
+      const map = {};
+      for (const row of latest) {
+        for (const gri of (row.gri_standards || [])) {
+          // 더 높은 등급 우선 (essential > potential > regular > not_applicable)
+          const cur = map[gri];
+          const newGrade = row.grade;
+          const order = { essential: 4, potential: 3, regular: 2, not_applicable: 1 };
+          if (!cur || (order[newGrade] || 0) > (order[cur] || 0)) {
+            map[gri] = newGrade;
+          }
+        }
+      }
+      setTopicGrades(map);
+    })();
+    return () => { alive = false; };
+  }, [supabase, company?.id]);
+  
+  // 메뉴 카테고리 → 등급 매핑 (gri_tags 기반)
+  function getMenuGrade(cat) {
+    const tags = cat.gri_tags || [];
+    if (tags.length === 0) return "regular";
+    // 가장 높은 등급 적용
+    const order = { essential: 4, potential: 3, regular: 2, not_applicable: 1 };
+    let best = "regular";
+    for (const tag of tags) {
+      const g = topicGrades[tag];
+      if (g && (order[g] || 0) > (order[best] || 0)) {
+        best = g;
+      }
+    }
+    return best;
+  }
+  
   // 그룹별 분류
   const grouped = useMemo(() => {
     const g = {};
@@ -1181,10 +1269,12 @@ function Sidebar({ profile, company, categories, selectedId, onSelect, onChangeC
                 <span className={`sb-group-chevron ${open ? "open" : ""}`}></span>
               </div>
               <div className={`sb-items ${open ? "open" : ""}`}>
-                {items.map(c => (
+                {items.map(c => {
+                  const grade = getMenuGrade(c);
+                  return (
                   <div
                     key={c.id}
-                    className={`sb-item ${selectedId === c.id ? "active" : ""}`}
+                    className={`sb-item grade-${grade} ${selectedId === c.id ? "active" : ""}`}
                     onClick={() => onSelect(c)}
                   >
                     <span>{c.name}</span>
@@ -1192,7 +1282,8 @@ function Sidebar({ profile, company, categories, selectedId, onSelect, onChangeC
                       <span className="sb-item-count">{c.field_count}</span>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );
@@ -1249,7 +1340,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
 
   // ===== Scope 1·2·3 연도별 합계 =====
   const scopeByYear = useMemo(() => {
-    const by = { 2022: { s1: 0, s2: 0, s3: 0 }, 2023: { s1: 0, s2: 0, s3: 0 }, 2024: { s1: 0, s2: 0, s3: 0 } };
+    const by = { 2023: { s1: 0, s2: 0, s3: 0 }, 2024: { s1: 0, s2: 0, s3: 0 }, 2025: { s1: 0, s2: 0, s3: 0 } };
     const fieldMap = {};
     fields.forEach(f => { fieldMap[f.id] = f; });
     inputs.forEach(inp => {
@@ -1259,10 +1350,9 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
       if (!by[inp.year] || !v) return;
       const griList = Array.isArray(f.gri_disclosures) ? f.gri_disclosures : [];
       const hit = (code) => griList.some(d => typeof d === "string" && d.includes(code));
-      const isCO2eq = f.unit === "tCO2eq";
-      if (isCO2eq && hit("102-5")) by[inp.year].s1 += v;
-      else if (isCO2eq && hit("102-6")) by[inp.year].s2 += v;
-      else if (isCO2eq && hit("102-7")) by[inp.year].s3 += v;
+      if (hit("102-5")) by[inp.year].s1 += v;
+      else if (hit("102-6")) by[inp.year].s2 += v;
+      else if (hit("102-7")) by[inp.year].s3 += v;
     });
     return by;
   }, [inputs, fields]);
@@ -1325,7 +1415,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
 
   // ===== 3년 추세 SVG =====
   const renderScopeTrendSVG = () => {
-    const years = [2022, 2023, 2024];
+    const years = [2023, 2024, 2025];
     const COL = { s1: "#ef4444", s2: "#f59e0b", s3: "#8b5cf6" };
     const allVals = years.flatMap(y => [scopeByYear[y].s1, scopeByYear[y].s2, scopeByYear[y].s3]);
     const maxVal = Math.max(...allVals, 1);
@@ -1465,17 +1555,17 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
           <h3 style={{ margin: 0 }}>📈 Scope 1·2·3 온실가스 배출량 3년 추세</h3>
           {(() => {
-            const t2023 = scopeByYear[2023].s1 + scopeByYear[2023].s2 + scopeByYear[2023].s3;
             const t2024 = scopeByYear[2024].s1 + scopeByYear[2024].s2 + scopeByYear[2024].s3;
-            if (t2023 <= 0 || t2024 <= 0) return null;
-            const pct = (t2024 - t2023) / t2023 * 100;
+            const t2025 = scopeByYear[2025].s1 + scopeByYear[2025].s2 + scopeByYear[2025].s3;
+            if (t2024 <= 0 || t2025 <= 0) return null;
+            const pct = (t2025 - t2024) / t2024 * 100;
             return (
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 4,
                 background: pct < 0 ? "rgba(16,185,129,0.2)" : "rgba(239,68,68,0.2)",
                 color: pct < 0 ? "#10b981" : "#ef4444",
               }}>
-                2023 → 2024 전년 대비 {pct < 0 ? "▼" : "▲"} {Math.abs(pct).toFixed(1)}%
+                2024 → 2025 전년 대비 {pct < 0 ? "▼" : "▲"} {Math.abs(pct).toFixed(1)}%
               </span>
             );
           })()}
@@ -1695,6 +1785,11 @@ function CategoryEditPane({ category, company, supabase, profile }) {
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState(null);
   const [err, setErr] = useState("");
+  
+  // 해당 여부 묻기 시스템
+  const [applicabilityMap, setApplicabilityMap] = useState({}); // field_id → boolean (true = 해당, false = 해당없음)
+  const [showApplicabilityStep, setShowApplicabilityStep] = useState(false);
+  const [applicabilityAnswered, setApplicabilityAnswered] = useState(false);
 
   // 카테고리 바뀌면 편집값 초기화
   useEffect(() => { setValues({}); setSavedAt(null); setErr(""); }, [category.id]);
@@ -1735,13 +1830,86 @@ function CategoryEditPane({ category, company, supabase, profile }) {
           map[inputKey(r.field_id, r.site_id, r.year)] = r;
         }
         setInputs(map);
+        
+        // 해당 여부 로드 (ask_user 필드만 대상)
+        const askFields = fList.filter(f => f.applicability_default === 'ask_user' || f.applicability_default === 'not_applicable');
+        if (askFields.length > 0) {
+          const { data: appData } = await supabase
+            .from("field_applicability")
+            .select("field_id, is_applicable")
+            .eq("company_id", company.id)
+            .in("field_id", askFields.map(f => f.id));
+          if (!alive) return;
+          const appMap = {};
+          // 기본값 적용 (not_applicable = false, ask_user = false 기본 + 회사 결정으로 덮어쓰기)
+          for (const f of askFields) {
+            appMap[f.id] = f.applicability_default === 'applicable';
+          }
+          // DB에 저장된 결정으로 덮어쓰기
+          for (const row of (appData || [])) {
+            appMap[row.field_id] = row.is_applicable;
+          }
+          setApplicabilityMap(appMap);
+          // 결정 안 한 필드가 있으면 첫 화면 표시
+          const hasUndecided = askFields.some(f => 
+            !(appData || []).find(d => d.field_id === f.id)
+          );
+          setApplicabilityAnswered(!hasUndecided);
+          setShowApplicabilityStep(hasUndecided);
+        } else {
+          setApplicabilityAnswered(true);
+          setShowApplicabilityStep(false);
+        }
       } else {
         setInputs({});
+        setApplicabilityAnswered(true);
+        setShowApplicabilityStep(false);
       }
       setLoading(false);
     })();
     return () => { alive = false; };
   }, [category.id, company.id, supabase]);
+  
+  // 해당 여부 저장
+  async function saveApplicability() {
+    const askFields = fields.filter(f => 
+      f.applicability_default === 'ask_user' || f.applicability_default === 'not_applicable'
+    );
+    if (askFields.length === 0) {
+      setApplicabilityAnswered(true);
+      setShowApplicabilityStep(false);
+      return;
+    }
+    const rows = askFields.map(f => ({
+      company_id: company.id,
+      field_id: f.id,
+      is_applicable: applicabilityMap[f.id] === true,
+      decided_at: new Date().toISOString(),
+      decided_by: profile.id,
+    }));
+    // upsert
+    for (const row of rows) {
+      const { data: existing } = await supabase
+        .from("field_applicability")
+        .select("id")
+        .eq("company_id", row.company_id)
+        .eq("field_id", row.field_id)
+        .maybeSingle();
+      if (existing?.id) {
+        await supabase.from("field_applicability").update(row).eq("id", existing.id);
+      } else {
+        await supabase.from("field_applicability").insert(row);
+      }
+    }
+    setApplicabilityAnswered(true);
+    setShowApplicabilityStep(false);
+  }
+  
+  // 필드 표시 여부 (해당없음이면 X)
+  function isFieldVisible(field) {
+    if (field.applicability_default === 'applicable') return true;
+    return applicabilityMap[field.id] === true;
+  }
 
   function getValue(field) {
     if (field.id in values) return values[field.id];
@@ -1870,6 +2038,138 @@ function CategoryEditPane({ category, company, supabase, profile }) {
         </div>
       </div>
 
+      {/* 해당 여부 첫 화면 - ask_user 또는 not_applicable 필드 있을 시 */}
+      {showApplicabilityStep && (() => {
+        const askFields = fields.filter(f => 
+          f.applicability_default === 'ask_user' || f.applicability_default === 'not_applicable'
+        );
+        if (askFields.length === 0) return null;
+        return (
+          <div style={{
+            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(14, 165, 233, 0.04))",
+            border: "1px solid rgba(59, 130, 246, 0.25)",
+            borderRadius: 12,
+            padding: 24,
+            marginBottom: 20,
+          }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#88ccff", marginBottom: 8 }}>
+              📋 귀사 해당 항목 체크
+            </div>
+            <div style={{ fontSize: 13, color: "#a0b0bd", marginBottom: 18, lineHeight: 1.5 }}>
+              본 메뉴에 일부 항목은 회사 상황에 따라 해당 여부가 다릅니다. 해당하는 항목만 체크해주세요. 
+              체크 안 한 항목은 입력 화면에서 자동 숨김 처리되고, 보고서에 "해당없음"으로 표시됩니다.
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {askFields.map(f => (
+                <label key={f.id} style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 12,
+                  padding: 14,
+                  background: applicabilityMap[f.id] === true ? "rgba(74, 222, 128, 0.08)" : "rgba(255, 255, 255, 0.02)",
+                  border: `1px solid ${applicabilityMap[f.id] === true ? "rgba(74, 222, 128, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={applicabilityMap[f.id] === true}
+                    onChange={(e) => {
+                      setApplicabilityMap(m => ({ ...m, [f.id]: e.target.checked }));
+                    }}
+                    style={{ marginTop: 3, width: 18, height: 18, cursor: "pointer" }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#e0e8ee", marginBottom: 4 }}>
+                      {f.label}
+                      {f.gri_disclosures && f.gri_disclosures.length > 0 && (
+                        <span style={{ 
+                          marginLeft: 8, 
+                          fontSize: 10, 
+                          padding: "2px 6px", 
+                          background: "rgba(74, 222, 128, 0.15)",
+                          color: "#4ade80",
+                          borderRadius: 4,
+                          fontWeight: 500,
+                        }}>
+                          GRI {f.gri_disclosures.join(", ")}
+                        </span>
+                      )}
+                    </div>
+                    {f.applicability_note && (
+                      <div style={{ fontSize: 12, color: "#8b9aa7", lineHeight: 1.5 }}>
+                        💡 {f.applicability_note}
+                      </div>
+                    )}
+                    {f.applicability_default === 'not_applicable' && (
+                      <div style={{ fontSize: 11, color: "#ffa94d", marginTop: 4 }}>
+                        ⚠️ 일반적으로 국내 협력사는 해당없음
+                      </div>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 18, gap: 10 }}>
+              <button
+                onClick={() => {
+                  // 모두 해당없음으로 설정
+                  const m = {};
+                  askFields.forEach(f => m[f.id] = false);
+                  setApplicabilityMap(m);
+                }}
+                style={{
+                  padding: "10px 18px",
+                  background: "transparent",
+                  border: "1px solid rgba(255, 255, 255, 0.15)",
+                  color: "#a0b0bd",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontSize: 13,
+                }}
+              >
+                모두 해당없음
+              </button>
+              <button
+                onClick={saveApplicability}
+                style={{
+                  padding: "10px 24px",
+                  background: "linear-gradient(135deg, #22c55e, #16a34a)",
+                  border: "none",
+                  color: "#fff",
+                  borderRadius: 6,
+                  cursor: "pointer",
+                  fontSize: 13,
+                  fontWeight: 600,
+                }}
+              >
+                확인 → 입력 시작
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+      {applicabilityAnswered && (
+        <div style={{ marginBottom: 10, display: "flex", justifyContent: "flex-end" }}>
+          <button
+            onClick={() => setShowApplicabilityStep(true)}
+            style={{
+              padding: "6px 12px",
+              background: "transparent",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              color: "#8b9aa7",
+              borderRadius: 4,
+              cursor: "pointer",
+              fontSize: 11,
+            }}
+          >
+            ⚙ 해당 여부 다시 설정
+          </button>
+        </div>
+      )}
+
       <div className="edit-toolbar">
         {hasAnyBySite && (
           <div className="toolbar-block">
@@ -1940,7 +2240,7 @@ function CategoryEditPane({ category, company, supabase, profile }) {
           />
           {viewMode === "card" ? (
             <CategoryCardWizard
-              fields={fields}
+              fields={fields.filter(isFieldVisible)}
               currentSite={currentSite}
               currentYear={currentYear}
               getValue={getValue}
@@ -1952,7 +2252,7 @@ function CategoryEditPane({ category, company, supabase, profile }) {
             />
           ) : (
             <div className="field-list">
-              {fields.map(f => (
+              {fields.filter(isFieldVisible).map(f => (
                 <FieldRow key={f.id}
                   field={f}
                   value={getValue(f)}
