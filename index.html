@@ -41,7 +41,7 @@
   }
   .card-wide { max-width: 720px; }
   .logo {
-    font-size: 13px; letter-spacing: 6px; color: #16a34a;
+    font-size: 13px; letter-spacing: 6px; color: #10b981;
     margin-bottom: 14px; font-weight: 600; text-align: center;
   }
   h1 { color: #111827;
@@ -63,11 +63,11 @@
     padding: 13px 16px; color: #1a1a1a; font-size: 15px;
     transition: border 0.15s; font-family: inherit;
   }
-  input:focus { outline: none; border-color: #16a34a; }
+  input:focus { outline: none; border-color: #10b981; }
   .field { margin-bottom: 16px; }
 
   button {
-    background: #16a34a;
+    background: #10b981;
     color: #1a1a1a; border: none; padding: 13px 20px; border-radius: 10px;
     font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
     transition: transform 0.12s, box-shadow 0.12s; font-family: inherit;
@@ -82,8 +82,8 @@
   button.ghost:hover { background: #f9fafb; box-shadow: none; }
 
   .err {
-    background: #fee2e2; border: 1px solid #fecaca;
-    color: #991b1b; padding: 12px 14px; border-radius: 8px; font-size: 13px;
+    background: #fafafa; border: 1px solid #e5e7eb;
+    color: #1f2937; padding: 12px 14px; border-radius: 8px; font-size: 13px;
     margin-bottom: 16px; line-height: 1.5;
   }
   .muted {
@@ -102,7 +102,7 @@
     transition: all 0.15s; text-align: left;
   }
   .company-card:hover {
-    background: #f0fdf4; border-color: #16a34a;
+    background: #f9fafb; border-color: #10b981;
     transform: translateY(-2px);
   }
   .company-card .cname { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
@@ -125,22 +125,22 @@
     padding: 18px 20px 14px;
     border-bottom: 1px solid #f5f5f5;
   }
-  .sb-brand { font-size: 12px; letter-spacing: 4px; color: #16a34a; font-weight: 700; }
+  .sb-brand { font-size: 12px; letter-spacing: 4px; color: #10b981; font-weight: 700; }
   .sb-company {
     margin-top: 10px;
-    background: #ecfdf5;
-    border: 1px solid rgba(136, 204, 255, 0.25);
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 10px 12px;
     display: flex; justify-content: space-between; align-items: center;
   }
-  .sb-company-name { font-size: 14px; font-weight: 700; color: #15803d; }
+  .sb-company-name { font-size: 14px; font-weight: 600; color: #111827; }
   .sb-company-change {
-    font-size: 11px; color: #16a34a; background: none; border: none;
+    font-size: 11px; color: #10b981; background: none; border: none;
     padding: 4px 8px; cursor: pointer; width: auto; letter-spacing: 0;
-    font-weight: 600;
+    font-weight: 500;
   }
-  .sb-company-change:hover { background: #d1fae5; box-shadow: none; }
+  .sb-company-change:hover { background: #f0fdf4; box-shadow: none; }
 
   .sb-nav { flex: 1; overflow-y: auto; padding: 10px 0; }
   .sb-nav::-webkit-scrollbar { width: 6px; }
@@ -173,17 +173,17 @@
     transition: all 0.12s; border-left: 3px solid transparent;
     user-select: none;
   }
-  .sb-item:hover { background: #fafafa; color: #1a1a1a; }
+  .sb-item:hover { background: #f9fafb; color: #111827; }
   .sb-item.active {
-    background: #ecfdf5;
-    color: #16a34a; font-weight: 600;
-    border-left-color: #16a34a;
+    background: #f0fdf4;
+    color: #10b981; font-weight: 600;
+    border-left-color: #10b981;
   }
   .sb-item-count {
-    font-size: 10px; color: #6b8290; background: #ffffff;
+    font-size: 10px; color: #6b7280; background: #f3f4f6;
     padding: 2px 6px; border-radius: 8px; min-width: 24px; text-align: center;
   }
-  .sb-item.active .sb-item-count { color: #16a34a; background: rgba(136,204,255,0.1); }
+  .sb-item.active .sb-item-count { color: #10b981; background: #d1fae5; }
 
   /* 이중중요성평가 4단계 등급 색상 - 라이트 톤 */
   .sb-item.grade-essential {
@@ -192,7 +192,7 @@
   }
   .sb-item.grade-essential::before {
     content: "★";
-    color: #dc2626;
+    color: #10b981;
     margin-right: 6px;
     font-size: 11px;
   }
@@ -201,7 +201,7 @@
   }
   .sb-item.grade-potential::before {
     content: "◆";
-    color: #ea580c;
+    color: #9ca3af;
     margin-right: 6px;
     font-size: 10px;
   }
@@ -209,12 +209,12 @@
     color: #6b7280;
   }
   .sb-item.grade-not_applicable {
-    color: #9ca3af;
-    opacity: 0.55;
+    color: #d1d5db;
+    opacity: 1;
   }
   .sb-item.grade-not_applicable::after {
     content: " (N/A)";
-    color: #9ca3af;
+    color: #d1d5db;
     font-size: 10px;
     margin-left: 4px;
   }
@@ -227,7 +227,7 @@
   .sb-user { display: flex; align-items: center; gap: 10px; font-size: 13px; }
   .sb-user-avatar {
     width: 30px; height: 30px; border-radius: 50%;
-    background: #16a34a;
+    background: #10b981;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 13px;
   }
@@ -241,14 +241,14 @@
     display: inline-block; font-weight: 700;
   }
   .role-staff      { background: #f3f4f6; color: #4b5563; }
-  .role-manager    { background: #d1fae5; color: #15803d; }
-  .role-consultant { background: #fef3c7; color: #92400e; }
+  .role-manager    { background: #f9fafb; color: #059669; }
+  .role-consultant { background: #fafafa; color: #92400e; }
 
   .sb-logout {
     background: transparent; border: 1px solid #e5e7eb;
     color: #6b7280; padding: 8px; font-size: 12.5px; width: 100%;
   }
-  .sb-logout:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #991b1b; box-shadow: none; }
+  .sb-logout:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #1f2937; box-shadow: none; }
 
   /* ===== 메인 영역 ===== */
   .main {
@@ -259,7 +259,7 @@
     margin-bottom: 28px; padding-bottom: 20px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-  .main-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+  .main-title { font-size: 24px; font-weight: 600; margin-bottom: 6px; color: #111827; letter-spacing: -0.3px; }
   .main-subtitle { font-size: 13px; color: #6b7280; }
   .main-meta {
     display: flex; gap: 10px; flex-wrap: wrap;
@@ -277,11 +277,11 @@
     gap: 14px; margin-bottom: 28px;
   }
   .stat {
-    background: #ffffff; border: 1px solid #f3f4f6;
-    border-radius: 12px; padding: 20px;
+    background: #ffffff; border: 1px solid #e5e7eb;
+    border-radius: 12px; padding: 22px 24px;
   }
-  .stat .n { font-size: 28px; font-weight: 700; color: #16a34a; }
-  .stat .l { font-size: 12px; color: #6b8290; margin-top: 4px; letter-spacing: 1px; }
+  .stat .n { font-size: 32px; font-weight: 600; color: #111827; letter-spacing: -0.5px; }
+  .stat .l { font-size: 11px; color: #6b7280; margin-top: 8px; letter-spacing: 0.5px; font-weight: 500; }
 
   .placeholder-box {
     background: #fafafa;
@@ -297,11 +297,11 @@
     gap: 14px; margin-top: 20px;
   }
   .welcome-card {
-    background: #f9fafb; border: 1px solid #f3f4f6;
-    border-radius: 12px; padding: 22px 22px;
+    background: #ffffff; border: 1px solid #e5e7eb;
+    border-radius: 12px; padding: 24px 24px;
   }
   .welcome-card h3 {
-    font-size: 15px; font-weight: 700; margin-bottom: 10px; color: #16a34a;
+    font-size: 15px; font-weight: 600; margin-bottom: 10px; color: #111827;
   }
   .welcome-card p {
     font-size: 13px; color: #6b7280; line-height: 1.6;
@@ -309,7 +309,7 @@
 
   .loading-dot {
     display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-    background: #88ccff; animation: pulse 1.4s infinite ease-in-out;
+    background: #10b981; animation: pulse 1.4s infinite ease-in-out;
     margin-right: 4px;
   }
   @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
@@ -341,7 +341,7 @@
     transform: none;
   }
   .tab.active {
-    background: rgba(136,204,255,0.12); color: #16a34a;
+    background: rgba(136,204,255,0.12); color: #10b981;
     border-color: rgba(136,204,255,0.3); font-weight: 700;
   }
 
@@ -353,7 +353,7 @@
   }
   .save-btn:hover { box-shadow: 0 6px 18px rgba(16,185,129,0.45); }
   .save-status {
-    font-size: 11.5px; color: #86efac; font-weight: 600;
+    font-size: 11.5px; color: #a7f3d0; font-weight: 600;
     letter-spacing: 0.3px;
   }
   .save-status.dirty { color: #fcd34d; }
@@ -411,7 +411,7 @@
     font-family: inherit; line-height: 1.55;
     transition: border 0.15s;
   }
-  textarea:focus { outline: none; border-color: #16a34a; }
+  textarea:focus { outline: none; border-color: #10b981; }
   select {
     width: 100%;
     background: #ffffff;
@@ -421,7 +421,7 @@
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill%3D%22%2388ccff%22%20d%3D%22M5%208l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
   }
-  select:focus { outline: none; border-color: #16a34a; }
+  select:focus { outline: none; border-color: #10b981; }
   input[type=number] {
     font-family: "SF Mono", "Consolas", monospace; letter-spacing: 0.3px;
   }
@@ -448,7 +448,7 @@
   }
   .multi-chip:hover { background: #fafafa; color: #1a1a1a; }
   .multi-chip.on {
-    background: rgba(136,204,255,0.12); color: #16a34a;
+    background: rgba(136,204,255,0.12); color: #10b981;
     border-color: rgba(136,204,255,0.3); font-weight: 700;
   }
 
@@ -501,7 +501,7 @@
     border-radius: 999px;
   }
   .mat-saving.saving { color: #d97706; border-color: #fcd34d; background: #fffbeb; }
-  .mat-saving.saved { color: #059669; border-color: #a7f3d0; background: #ecfdf5; }
+  .mat-saving.saved { color: #059669; border-color: #a7f3d0; background: #ffffff; }
   /* ===== v1.0: 카드형 위자드 ===== */
   .mode-toggle {
     display: inline-flex;
@@ -524,7 +524,7 @@
   }
   .mode-toggle button.active {
     background: rgba(136,204,255,0.2);
-    color: #16a34a;
+    color: #10b981;
   }
   .excel-upload {
     display: inline-flex;
@@ -603,9 +603,9 @@
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: #d1fae5;
+    background: #f9fafb;
     border: 1px solid rgba(136,204,255,0.3);
-    color: #16a34a;
+    color: #10b981;
     font-size: 12px;
     font-weight: 700;
     cursor: help;
@@ -635,7 +635,7 @@
   }
   .help-tooltip-title {
     font-weight: 700;
-    color: #16a34a;
+    color: #10b981;
     margin-bottom: 6px;
     font-size: 12px;
   }
@@ -699,13 +699,13 @@
     border-color: rgba(136,204,255,0.3);
   }
   .pick-chip.active {
-    background: #d1fae5;
-    border-color: #16a34a;
+    background: #f9fafb;
+    border-color: #10b981;
     color: #1a1a1a;
   }
   .pick-chip.active::before {
     content: '✓';
-    color: #16a34a;
+    color: #10b981;
     font-weight: 700;
   }
   .rec-badge {
@@ -846,7 +846,7 @@
   .card-boolean-btn.active.no {
     background: rgba(239,68,68,0.15);
     border-color: #ef4444;
-    color: #991b1b;
+    color: #1f2937;
   }
   .card-select-group {
     display: flex;
@@ -866,8 +866,8 @@
   }
   .card-select-option:hover { background: #ffffff; }
   .card-select-option.active {
-    background: #d1fae5;
-    border-color: #16a34a;
+    background: #f9fafb;
+    border-color: #10b981;
     color: #1a1a1a;
     font-weight: 600;
   }
@@ -898,8 +898,8 @@
     margin-top: 4px;
   }
   .auto-summary-copy {
-    background: #d1fae5;
-    color: #16a34a;
+    background: #f9fafb;
+    color: #10b981;
     border: 1px solid rgba(136, 204, 255, 0.3);
     padding: 8px 14px;
     border-radius: 8px;
@@ -965,8 +965,8 @@
   .auto-summary-missing {
     margin-top: 12px;
     padding: 10px 14px;
-    background: #fef3c7;
-    border: 1px solid #fde68a;
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 11px;
     color: #92400e;
@@ -974,14 +974,14 @@
   .auto-summary-report {
     margin-top: 20px;
     padding: 16px 18px;
-    background: #ede9fe;
-    border: 1px solid #ddd6fe;
+    background: #fafafa;
+    border: 1px solid #e5e7eb;
     border-radius: 10px;
   }
   .auto-summary-report h4 {
     font-size: 12px;
     font-weight: 700;
-    color: #c4b5fd;
+    color: #6b7280;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     margin-bottom: 10px;
@@ -1251,7 +1251,7 @@ function Sidebar({ profile, company, categories, selectedId, onSelect, onChangeC
           <button
             className={"sb-item" + (selectedId === '__ai_description__' ? " active" : "")}
             onClick={() => onSelect({ id: '__ai_description__', name: 'AI 설명 재생성', code: '__ai_description__' })}
-            style={{ marginBottom: 8, fontWeight: 600, background: selectedId === '__ai_description__' ? undefined : "#ede9fe", color: selectedId === '__ai_description__' ? undefined : "#c4b5fd", border: "1px solid #ddd6fe" }}
+            style={{ marginBottom: 8, fontWeight: 500, background: selectedId === '__ai_description__' ? undefined : "#fafafa", color: selectedId === '__ai_description__' ? undefined : "#6b7280", border: "1px solid #e5e7eb" }}
           >
             🤖 AI 설명 재생성
           </button>
@@ -1416,7 +1416,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
   // ===== 3년 추세 SVG =====
   const renderScopeTrendSVG = () => {
     const years = [2023, 2024, 2025];
-    const COL = { s1: "#166534", s2: "#0891b2", s3: "#7c3aed" };
+    const COL = { s1: "#047857", s2: "#10b981", s3: "#6ee7b7" };
     const allVals = years.flatMap(y => [scopeByYear[y].s1, scopeByYear[y].s2, scopeByYear[y].s3]);
     const maxVal = Math.max(...allVals, 1);
     const niceMax = Math.ceil(maxVal * 1.15 / 10) * 10 || 10;
@@ -1528,22 +1528,22 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
 
       {/* KPI 4개 */}
       <div className="stats-grid">
-        <div className="stat" style={{ background: "#f0fdf4", border: "1px solid #d1fae5" }}>
-          <div className="n">{stats.filled}<span style={{ fontSize: 18, color: "#9ca3af" }}> / {stats.totalFields}</span></div>
-          <div className="l" style={{ color: "#16a34a" }}>입력 완료 필드</div>
+        <div className="stat">
+          <div className="n">{stats.filled}<span style={{ fontSize: 18, color: "#9ca3af", fontWeight: 400 }}> / {stats.totalFields}</span></div>
+          <div className="l">입력 완료 필드</div>
         </div>
         <div className="stat">
-          <div className="n" style={{ color: stats.overallPct >= 80 ? "#15803d" : stats.overallPct >= 40 ? "#16a34a" : "#111827" }}>
-            {stats.overallPct.toFixed(1)}<span style={{ fontSize: 18, color: "#16a34a" }}>%</span>
+          <div className="n" style={{ color: stats.overallPct >= 80 ? "#059669" : stats.overallPct >= 40 ? "#10b981" : "#111827" }}>
+            {stats.overallPct.toFixed(1)}<span style={{ fontSize: 18, color: "#10b981", fontWeight: 400 }}>%</span>
           </div>
           <div className="l">전체 입력 진행률</div>
         </div>
         <div className="stat">
-          <div className="n">{matSummary.assessedCount}<span style={{ fontSize: 18, color: "#9ca3af" }}> / 15</span></div>
+          <div className="n">{matSummary.assessedCount}<span style={{ fontSize: 18, color: "#9ca3af", fontWeight: 400 }}> / 15</span></div>
           <div className="l">이중중대성 평가</div>
         </div>
         <div className="stat">
-          <div className="n" style={{ color: matSummary.confirmed ? "#15803d" : "#111827" }}>
+          <div className="n" style={{ color: matSummary.confirmed ? "#059669" : "#111827" }}>
             {matSummary.confirmed ? `${matSummary.coreCount}` : "—"}
           </div>
           <div className="l">{matSummary.confirmed ? "핵심 이슈 확정" : "아직 미확정"}</div>
@@ -1553,7 +1553,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
       {/* Scope 1·2·3 3년 추세 그래프 */}
       <div className="welcome-card" style={{ marginTop: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
-          <h3 style={{ margin: 0 }}>📈 Scope 1·2·3 온실가스 배출량 3년 추세</h3>
+          <h3 style={{ margin: 0 }}>Scope 1·2·3 온실가스 배출량 3년 추세</h3>
           {(() => {
             const t2024 = scopeByYear[2024].s1 + scopeByYear[2024].s2 + scopeByYear[2024].s3;
             const t2025 = scopeByYear[2025].s1 + scopeByYear[2025].s2 + scopeByYear[2025].s3;
@@ -1563,7 +1563,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 4,
                 background: pct < 0 ? "rgba(22,163,74,0.15)" : "rgba(255,255,255,0.06)",
-                color: pct < 0 ? "#4ade80" : "#fbbf24",
+                color: pct < 0 ? "#34d399" : "#fbbf24",
               }}>
                 2024 → 2025 전년 대비 {pct < 0 ? "▼" : "▲"} {Math.abs(pct).toFixed(1)}%
               </span>
@@ -1579,21 +1579,22 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
       {/* 카테고리별 진행률 */}
       {stats.catProgress.length > 0 && (
         <div className="welcome-card" style={{ marginTop: 16 }}>
-          <h3 style={{ margin: "0 0 4px 0" }}>📊 카테고리별 입력 진행률</h3>
+          <h3 style={{ margin: "0 0 4px 0" }}>카테고리별 입력 진행률</h3>
           <p style={{ fontSize: 12, marginBottom: 14, color: "rgba(255,255,255,0.55)" }}>
             {stats.catProgress.length}개 카테고리 · 담당 부서 진행 상황
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {stats.catProgress.map(c => {
-              const color = c.pct >= 85 ? "#15803d" : c.pct >= 70 ? "#16a34a" : c.pct >= 50 ? "#4ade80" : c.pct >= 25 ? "#86efac" : c.pct > 0 ? "#bbf7d0" : "#e5e7eb";
+              const barColor = c.pct > 0 ? "#10b981" : "#e5e7eb";
+              const pctColor = c.pct >= 50 ? "#10b981" : c.pct > 0 ? "#6b7280" : "#9ca3af";
               return (
                 <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ flex: "0 0 200px", fontSize: 13, color: "#1f2937" }}>{c.name}</div>
-                  <div style={{ flex: 1, height: 8, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
-                    <div style={{ width: `${c.pct}%`, height: "100%", background: color, transition: "width 0.4s" }} />
+                  <div style={{ flex: "0 0 200px", fontSize: 13, color: "#111827", fontWeight: 500 }}>{c.name}</div>
+                  <div style={{ flex: 1, height: 6, background: "#f3f4f6", borderRadius: 3, overflow: "hidden" }}>
+                    <div style={{ width: `${c.pct}%`, height: "100%", background: barColor, transition: "width 0.4s", borderRadius: 3 }} />
                   </div>
-                  <div style={{ flex: "0 0 110px", textAlign: "right", fontSize: 12, color: "#4b5563", fontFeatureSettings: "'tnum'" }}>
-                    {c.filled} / {c.total} · <strong style={{ color }}>{c.pct.toFixed(0)}%</strong>
+                  <div style={{ flex: "0 0 110px", textAlign: "right", fontSize: 12, color: "#6b7280", fontFeatureSettings: "'tnum'" }}>
+                    {c.filled} / {c.total} · <strong style={{ color: pctColor, fontWeight: 600 }}>{c.pct.toFixed(0)}%</strong>
                   </div>
                 </div>
               );
@@ -2046,13 +2047,13 @@ function CategoryEditPane({ category, company, supabase, profile }) {
         if (askFields.length === 0) return null;
         return (
           <div style={{
-            background: "#f0fdf4",
-            border: "1px solid #d1fae5",
+            background: "#ffffff",
+            border: "1px solid #e5e7eb",
             borderRadius: 12,
             padding: 24,
             marginBottom: 20,
           }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#15803d", marginBottom: 8 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#059669", marginBottom: 8 }}>
               📋 귀사 해당 항목 체크
             </div>
             <div style={{ fontSize: 13, color: "#4b5563", marginBottom: 18, lineHeight: 1.5 }}>
@@ -2067,7 +2068,7 @@ function CategoryEditPane({ category, company, supabase, profile }) {
                   gap: 12,
                   padding: 14,
                   background: applicabilityMap[f.id] === true ? "#d1fae5" : "#ffffff",
-                  border: `1px solid ${applicabilityMap[f.id] === true ? "#86efac" : "#e5e7eb"}`,
+                  border: `1px solid ${applicabilityMap[f.id] === true ? "#a7f3d0" : "#e5e7eb"}`,
                   borderRadius: 8,
                   cursor: "pointer",
                   transition: "all 0.15s",
@@ -2089,7 +2090,7 @@ function CategoryEditPane({ category, company, supabase, profile }) {
                           fontSize: 10, 
                           padding: "2px 6px", 
                           background: "#d1fae5",
-                          color: "#15803d",
+                          color: "#059669",
                           borderRadius: 4,
                           fontWeight: 500,
                         }}>
@@ -2134,7 +2135,7 @@ function CategoryEditPane({ category, company, supabase, profile }) {
                 onClick={saveApplicability}
                 style={{
                   padding: "10px 24px",
-                  background: "#16a34a",
+                  background: "#10b981",
                   border: "none",
                   color: "#fff",
                   borderRadius: 6,
@@ -2719,7 +2720,7 @@ function MaterialityMatrixV2({ result, width = 640, height = 480 }) {
   const colorMap = { emerald: "#10b981", blue: "#3b82f6", violet: "#8b5cf6" };
   return (
     <svg width={width} height={height} style={{ background: "#fafafa", borderRadius: 8 }}>
-      <rect x={padding.left + plotW * 0.5} y={padding.top} width={plotW * 0.5} height={plotH * 0.5} fill="#fef3c7" opacity="0.3" />
+      <rect x={padding.left + plotW * 0.5} y={padding.top} width={plotW * 0.5} height={plotH * 0.5} fill="#fafafa" opacity="0.3" />
       <text x={padding.left + plotW * 0.75} y={padding.top + 20} textAnchor="middle" fontSize="11" fill="#92400e" fontWeight="700">핵심 이슈 영역</text>
       <line x1={xScale(0.5)} y1={padding.top} x2={xScale(0.5)} y2={padding.top + plotH} stroke="#e5e7eb" strokeDasharray="4,4" />
       <line x1={padding.left} y1={yScale(0.5)} x2={padding.left + plotW} y2={yScale(0.5)} stroke="#e5e7eb" strokeDasharray="4,4" />
@@ -3270,7 +3271,7 @@ function MatrixPage({ responses, meta, updateMeta }) {
         <MaterialityMatrixV2 result={result} />
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-        <ResultBox title="🎯 핵심 이슈" color="#d97706" bg="#fef3c7" items={result.core} desc="보고서 우선 공시" />
+        <ResultBox title="🎯 핵심 이슈" color="#d97706" bg="#fafafa" items={result.core} desc="보고서 우선 공시" />
         <ResultBox title="📋 관리 이슈" color="#2563eb" bg="#dbeafe" items={result.manage} desc="지속 모니터링" />
         <ResultBox title="👀 참고 이슈" color="#6b7280" bg="#f3f4f6" items={result.monitor} desc="변화 추적" />
       </div>
@@ -3316,7 +3317,7 @@ function ConfirmPage({ responses, data, setBlockData, MAT_KEY, meta }) {
           <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>✅ 6단계: 확정</h3>
           {confirmed
             ? <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: "#059669", padding: "3px 10px", borderRadius: 4 }}>🔒 확정 완료</span>
-            : <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e", background: "#fef3c7", padding: "3px 10px", borderRadius: 4, border: "1px solid #fcd34d" }}>확정 대기</span>
+            : <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e", background: "#fafafa", padding: "3px 10px", borderRadius: 4, border: "1px solid #fcd34d" }}>확정 대기</span>
           }
         </div>
         <p style={{ fontSize: 13, color: "#6b7280" }}>아래 {result.core.length}개 주제가 보고서 필수 공시 대상으로 확정됩니다. 확정 후에도 "재오픈"으로 수정 가능 (이력 보존).</p>
@@ -3330,7 +3331,7 @@ function ConfirmPage({ responses, data, setBlockData, MAT_KEY, meta }) {
       <div style={{ background: "#fff", border: "2px solid #d97706", borderRadius: 8, padding: 18, marginBottom: 16 }}>
         <h4 style={{ fontSize: 15, fontWeight: 700, color: "#92400e", marginBottom: 12 }}>🎯 확정 대상 핵심 이슈</h4>
         {result.core.map(c => (
-          <div key={c.code} style={{ padding: "10px 12px", background: "#fef3c7", borderRadius: 5, marginBottom: 6 }}>
+          <div key={c.code} style={{ padding: "10px 12px", background: "#fafafa", borderRadius: 5, marginBottom: 6 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <strong>{c.code}</strong> · {c.title}
@@ -3650,7 +3651,7 @@ ${field.unit ? `- 단위: ${field.unit}` : ""}
           </button>
           <button disabled={generating || filteredFields.length === 0}
             onClick={() => runGeneration(filteredFields)}
-            style={{ background: "#fde68a", color: "#fbbf24", padding: "10px 18px", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 10, fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
+            style={{ background: "#e5e7eb", color: "#fbbf24", padding: "10px 18px", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 10, fontWeight: 600, cursor: "pointer", fontSize: 13 }}>
             ♻️ 전체 {filteredFields.length}개 재생성 (덮어쓰기)
           </button>
         </div>
