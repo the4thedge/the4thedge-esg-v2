@@ -1416,7 +1416,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
   // ===== 3년 추세 SVG =====
   const renderScopeTrendSVG = () => {
     const years = [2023, 2024, 2025];
-    const COL = { s1: "#ef4444", s2: "#f59e0b", s3: "#8b5cf6" };
+    const COL = { s1: "#15803d", s2: "#4ade80", s3: "#86efac" };
     const allVals = years.flatMap(y => [scopeByYear[y].s1, scopeByYear[y].s2, scopeByYear[y].s3]);
     const maxVal = Math.max(...allVals, 1);
     const niceMax = Math.ceil(maxVal * 1.15 / 10) * 10 || 10;
@@ -1528,13 +1528,13 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
 
       {/* KPI 4개 */}
       <div className="stats-grid">
-        <div className="stat">
+        <div className="stat" style={{ background: "rgba(22, 163, 74, 0.08)", border: "1px solid rgba(22, 163, 74, 0.2)" }}>
           <div className="n">{stats.filled}<span style={{ fontSize: 18, color: "rgba(255,255,255,0.5)" }}> / {stats.totalFields}</span></div>
-          <div className="l">입력 완료 필드</div>
+          <div className="l" style={{ color: "#4ade80" }}>입력 완료 필드</div>
         </div>
         <div className="stat">
-          <div className="n" style={{ color: stats.overallPct >= 80 ? "#10b981" : stats.overallPct >= 40 ? "#f59e0b" : "#fff" }}>
-            {stats.overallPct.toFixed(1)}<span style={{ fontSize: 18 }}>%</span>
+          <div className="n" style={{ color: stats.overallPct >= 80 ? "#15803d" : stats.overallPct >= 40 ? "#4ade80" : "#fff" }}>
+            {stats.overallPct.toFixed(1)}<span style={{ fontSize: 18, color: "#4ade80" }}>%</span>
           </div>
           <div className="l">전체 입력 진행률</div>
         </div>
@@ -1543,8 +1543,8 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
           <div className="l">이중중대성 평가</div>
         </div>
         <div className="stat">
-          <div className="n" style={{ color: matSummary.confirmed ? "#10b981" : "#fff" }}>
-            {matSummary.confirmed ? `🔒 ${matSummary.coreCount}` : "—"}
+          <div className="n" style={{ color: matSummary.confirmed ? "#15803d" : "#fff" }}>
+            {matSummary.confirmed ? `${matSummary.coreCount}` : "—"}
           </div>
           <div className="l">{matSummary.confirmed ? "핵심 이슈 확정" : "아직 미확정"}</div>
         </div>
@@ -1562,8 +1562,8 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
             return (
               <span style={{
                 fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 4,
-                background: pct < 0 ? "rgba(16,185,129,0.2)" : "rgba(239,68,68,0.2)",
-                color: pct < 0 ? "#10b981" : "#ef4444",
+                background: pct < 0 ? "rgba(22,163,74,0.15)" : "rgba(255,255,255,0.06)",
+                color: pct < 0 ? "#4ade80" : "#fbbf24",
               }}>
                 2024 → 2025 전년 대비 {pct < 0 ? "▼" : "▲"} {Math.abs(pct).toFixed(1)}%
               </span>
@@ -1585,7 +1585,7 @@ function WelcomePane({ company, categoriesCount, supabase, profile }) {
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {stats.catProgress.map(c => {
-              const color = c.pct >= 80 ? "#10b981" : c.pct >= 40 ? "#f59e0b" : c.pct > 0 ? "#3b82f6" : "#6b7280";
+              const color = c.pct >= 85 ? "#15803d" : c.pct >= 70 ? "#16a34a" : c.pct >= 50 ? "#4ade80" : c.pct >= 25 ? "#86efac" : c.pct > 0 ? "#bbf7d0" : "#374151";
               return (
                 <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ flex: "0 0 200px", fontSize: 13, color: "rgba(255,255,255,0.85)" }}>{c.name}</div>
